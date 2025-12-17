@@ -1,0 +1,65 @@
+﻿@model FurnitureShop.ViewModels.Account.RegisterVm
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<h2 class="mb-3">Đăng ký</h2>
+
+<form method="post" asp-action="Register" asp-controller="Account">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">UserName</label>
+            <input class="form-control" asp-for="UserName" />
+            <span class="text-danger" asp-validation-for="UserName"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input class="form-control" asp-for="Email" />
+            <span class="text-danger" asp-validation-for="Email"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Số điện thoại</label>
+            <input class="form-control" asp-for="Phone" />
+            <span class="text-danger" asp-validation-for="Phone"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Họ tên</label>
+            <input class="form-control" asp-for="FullName" />
+            <span class="text-danger" asp-validation-for="FullName"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Địa chỉ</label>
+            <input class="form-control" asp-for="Address" />
+            <span class="text-danger" asp-validation-for="Address"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Mật khẩu</label>
+            <input class="form-control" asp-for="Password" type="password" />
+            <span class="text-danger" asp-validation-for="Password"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Nhập lại mật khẩu</label>
+            <input class="form-control" asp-for="ConfirmPassword" type="password" />
+            <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
+        </div>
+    </div>
+
+    <div class="text-danger mt-2">
+        @Html.ValidationSummary()
+    </div>
+
+    <button class="btn btn-primary mt-3">Tạo tài khoản</button>
+    <a class="btn btn-link mt-3" href="/account/login">Đã có tài khoản? Đăng nhập</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

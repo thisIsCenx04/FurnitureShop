@@ -1,0 +1,54 @@
+﻿@model FurnitureShop.ViewModels.Account.ProfileVm
+@{
+    ViewData["Title"] = "Tài khoản";
+}
+
+<h2 class="mb-3">Thông tin tài khoản</h2>
+
+@if (ViewBag.Success != null)
+{
+    <div class="alert alert-success">@ViewBag.Success</div>
+}
+
+<form method="post" asp-action="Profile" asp-controller="Account">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">UserName</label>
+            <input class="form-control" asp-for="UserName" readonly />
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input class="form-control" asp-for="Email" readonly />
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Họ tên</label>
+            <input class="form-control" asp-for="FullName" />
+            <span class="text-danger" asp-validation-for="FullName"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Số điện thoại</label>
+            <input class="form-control" asp-for="Phone" />
+            <span class="text-danger" asp-validation-for="Phone"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Địa chỉ</label>
+            <input class="form-control" asp-for="Address" />
+            <span class="text-danger" asp-validation-for="Address"></span>
+        </div>
+    </div>
+
+    <div class="text-danger mt-2">
+        @Html.ValidationSummary()
+    </div>
+
+    <button class="btn btn-primary mt-3">Cập nhật</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

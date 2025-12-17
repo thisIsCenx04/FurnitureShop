@@ -1,18 +1,30 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Work\\FurnitureShop\\",
+  "WorkspaceRootPath": "D:\\Work\\FurnitureShop\\FurnitureShop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\furnitureshop\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\furnitureshop\\furnitureshop.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:furnitureshop.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\furnitureshop\\views\\shared\\_header.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:views\\shared\\_header.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\furnitureshop\\areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\furnitureshop\\services\\seeds\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:services\\seeds\\dbseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\furnitureshop\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|d:\\work\\furnitureshop\\views\\shared\\components\\categorymenu\\default.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E9D94DCB-040C-4417-8359-D640515D593C}|FurnitureShop.csproj|solutionrelative:views\\shared\\components\\categorymenu\\default.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,45 +34,87 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DbSeeder.cs",
+              "DocumentMoniker": "D:\\Work\\FurnitureShop\\FurnitureShop\\Services\\Seeds\\DbSeeder.cs",
+              "RelativeDocumentMoniker": "Services\\Seeds\\DbSeeder.cs",
+              "ToolTip": "D:\\Work\\FurnitureShop\\FurnitureShop\\Services\\Seeds\\DbSeeder.cs",
+              "RelativeToolTip": "Services\\Seeds\\DbSeeder.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAQwBsAAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-17T20:44:42.492Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "D:\\Work\\FurnitureShop\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "D:\\Work\\FurnitureShop\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAkwBYAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-12-17T19:48:31.039Z",
+              "Title": "FurnitureShop",
+              "DocumentMoniker": "D:\\Work\\FurnitureShop\\FurnitureShop\\FurnitureShop.csproj",
+              "RelativeDocumentMoniker": "FurnitureShop.csproj",
+              "ToolTip": "D:\\Work\\FurnitureShop\\FurnitureShop\\FurnitureShop.csproj",
+              "RelativeToolTip": "FurnitureShop.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-17T20:39:13.019Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Work\\FurnitureShop\\FurnitureShop\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "D:\\Work\\FurnitureShop\\FurnitureShop\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAAAFgAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-17T19:30:43.576Z",
+              "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Default.cshtml",
-              "DocumentMoniker": "D:\\Work\\FurnitureShop\\Views\\Shared\\Components\\CategoryMenu\\Default.cshtml",
-              "RelativeDocumentMoniker": "Views\\Shared\\Components\\CategoryMenu\\Default.cshtml",
-              "ToolTip": "D:\\Work\\FurnitureShop\\Views\\Shared\\Components\\CategoryMenu\\Default.cshtml",
-              "RelativeToolTip": "Views\\Shared\\Components\\CategoryMenu\\Default.cshtml",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAIwB0AAAAAAAAAAAAAAA==",
+              "Title": "_Header.cshtml",
+              "DocumentMoniker": "D:\\Work\\FurnitureShop\\FurnitureShop\\Views\\Shared\\_Header.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_Header.cshtml",
+              "ToolTip": "D:\\Work\\FurnitureShop\\FurnitureShop\\Views\\Shared\\_Header.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_Header.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-12-17T19:44:16.632Z",
+              "WhenOpened": "2025-12-17T21:24:21.687Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "D:\\Work\\FurnitureShop\\FurnitureShop\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "D:\\Work\\FurnitureShop\\FurnitureShop\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-17T21:09:09.941Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Work\\FurnitureShop\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\Work\\FurnitureShop\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAiAAAAAAAAAA==",
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "D:\\Work\\FurnitureShop\\FurnitureShop\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AccountController.cs",
+              "ToolTip": "D:\\Work\\FurnitureShop\\FurnitureShop\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "Controllers\\AccountController.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAowFsAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-17T19:30:43.576Z",
+              "WhenOpened": "2025-12-17T21:07:59.073Z",
               "EditorCaption": ""
             }
           ]

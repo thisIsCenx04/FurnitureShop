@@ -79,9 +79,18 @@ app.UseAuthorization();
 app.MapHub<NotificationHub>("/hubs/notifications");
 
 // Route Area 
+// ADMIN route (lock with AdminOnly)
+app.MapControllerRoute(
+    name: "admin",
+    pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}",
+    defaults: new { area = "Admin" }
+).RequireAuthorization("AdminOnly");
+
+// Generic areas route 
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+
 
 // Default route
 app.MapControllerRoute(
