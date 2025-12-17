@@ -1,0 +1,29 @@
+﻿@model List<FurnitureShop.ViewComponents.CategoryMenuViewComponent.Node>
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+        Danh mục
+    </a>
+    <ul class="dropdown-menu">
+        @foreach (var root in Model)
+        {
+            if (root.Children.Any())
+            {
+                <li><h6 class="dropdown-header">@root.Name</h6></li>
+                @foreach (var child in root.Children)
+                {
+                    <li>
+                        <a class="dropdown-item" href="/products?category=@child.Slug">@child.Name</a>
+                    </li>
+                }
+                <li><hr class="dropdown-divider"></li>
+            }
+            else
+            {
+                <li>
+                    <a class="dropdown-item" href="/products?category=@root.Slug">@root.Name</a>
+                </li>
+            }
+        }
+    </ul>
+</li>

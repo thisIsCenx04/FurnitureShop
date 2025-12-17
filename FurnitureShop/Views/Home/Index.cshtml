@@ -1,0 +1,55 @@
+﻿@model FurnitureShop.ViewModels.HomeIndexVm
+@using FurnitureShop.Helpers
+
+<div class="py-4">
+    <h1 class="mb-3">FurnitureShop</h1>
+    <p class="text-muted mb-4">Demo core module: layout + seed + dbcontext + helpers</p>
+
+    <h4>Danh mục nổi bật</h4>
+    <div class="row g-3 mb-4">
+        @foreach (var c in Model.Categories)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="border rounded p-3 h-100">
+                    <div class="fw-semibold">@c.Name</div>
+                    <div class="text-muted small">@c.Slug</div>
+                    <a class="btn btn-sm btn-outline-primary mt-2" href="/products?category=@c.Slug">
+                        Xem sản phẩm
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h4>Sản phẩm mới</h4>
+    <div class="row g-3">
+        @foreach (var p in Model.Products)
+        {
+            var img = string.IsNullOrWhiteSpace(p.MainImageUrl)
+            ? "/images/placeholder.png"
+            : p.MainImageUrl;
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card h-100">
+                    <img class="card-img-top" src="@img" alt="@p.Name" style="aspect-ratio: 4/3; object-fit: cover;" />
+                    <div class="card-body">
+                        <div class="fw-semibold">@p.Name</div>
+                        <div class="text-muted small">@p.Slug</div>
+
+                        <div class="mt-2">
+                            @if (p.SalePrice.HasValue)
+                            {
+                                <div class="text-decoration-line-through text-muted">@p.Price.ToVnd()</div>
+                                <div class="fw-bold">@p.SalePrice.Value.ToVnd()</div>
+                            }
+                            else
+                            {
+                                <div class="fw-bold">@p.Price.ToVnd()</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
