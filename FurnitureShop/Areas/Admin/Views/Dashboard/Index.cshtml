@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2>Dashboard (Admin)</h2>
+<p>Nếu bạn thấy trang này nghĩa là role Admin đã được gắn đúng.</p>
+
+<div class="alert alert-info">
+    <div><b>User:</b> @User.Identity?.Name</div>
+    <div><b>IsAdmin:</b> @User.IsInRole("Admin")</div>
+</div>

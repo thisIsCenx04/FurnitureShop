@@ -17,6 +17,35 @@ public sealed class DbSeeder : IDbSeeder
         // Chỉ seed khi DEV (tránh “đụng dữ liệu thật”)
         if (!env.IsDevelopment()) return;
 
+        // Seed admin user (DEV only)
+        if (!await _db.Users.AsNoTracking().AnyAsync())
+        {
+            _db.Users.Add(new User
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserName = "admin",
+                Email = "admin@furniture.local",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+                Role = 1,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _db.Users.Add(new User
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserName = "user",
+                Email = "user@furniture.local",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("User@123"),
+                Role = 0,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _db.SaveChangesAsync();
+        }
+
+
         // Nếu đã có dữ liệu thì bỏ qua
         var hasAnyCategory = await _db.Categories.AsNoTracking().AnyAsync();
         var hasAnyProduct = await _db.Products.AsNoTracking().AnyAsync();

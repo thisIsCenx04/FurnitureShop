@@ -1,0 +1,39 @@
+﻿@model FurnitureShop.ViewModels.Account.LoginVm
+@{
+    ViewData["Title"] = "Đăng nhập";
+    var returnUrl = (string?)ViewBag.ReturnUrl;
+}
+
+<h2 class="mb-3">Đăng nhập</h2>
+
+<form method="post" asp-action="Login" asp-controller="Account" asp-route-returnUrl="@returnUrl">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">UserName hoặc Email</label>
+        <input class="form-control" asp-for="UserNameOrEmail" />
+        <span class="text-danger" asp-validation-for="UserNameOrEmail"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Mật khẩu</label>
+        <input class="form-control" asp-for="Password" type="password" />
+        <span class="text-danger" asp-validation-for="Password"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" asp-for="RememberMe" />
+        <label class="form-check-label" asp-for="RememberMe">Ghi nhớ đăng nhập</label>
+    </div>
+
+    <div class="text-danger mb-2">
+        @Html.ValidationSummary()
+    </div>
+
+    <button class="btn btn-primary">Đăng nhập</button>
+    <a class="btn btn-link" href="/account/register">Đăng ký</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

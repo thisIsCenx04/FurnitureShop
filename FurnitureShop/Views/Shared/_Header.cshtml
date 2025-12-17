@@ -9,6 +9,14 @@
 
             <div class="collapse navbar-collapse" id="topnav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                Quản trị
+                            </a>
+                        </li>
+                    }
                     <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
                     <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
 
@@ -16,10 +24,26 @@
                     @await Component.InvokeAsync("CategoryMenu")
                 </ul>
 
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 align-items-center">
                     <a class="btn btn-outline-secondary btn-sm" href="/cart">Giỏ hàng</a>
-                    <a class="btn btn-outline-primary btn-sm" href="/account/login">Đăng nhập</a>
+
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <a class="btn btn-outline-primary btn-sm" href="/account/profile">
+                            @User.Identity!.Name
+                        </a>
+
+                        <form method="post" action="/account/logout" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-danger btn-sm" type="submit">Đăng xuất</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary btn-sm" href="/account/login">Đăng nhập</a>
+                    }
                 </div>
+
             </div>
         </div>
     </nav>
