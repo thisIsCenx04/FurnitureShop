@@ -4,6 +4,7 @@ using FurnitureShop.Services.Seed;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using FurnitureShop.Services.Auth;
+using FurnitureShop.Services.Cart;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +16,6 @@ builder.Services.AddDbContext<FurnitureShopContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("FurnitureShop"));
 });
-
-
 
 // Session
 builder.Services.AddDistributedMemoryCache();
@@ -52,6 +51,9 @@ builder.Services.AddScoped<IDbSeeder, DbSeeder>();
 
 // Auth service
 builder.Services.AddScoped<IUserService, UserService>();
+
+//Cart service
+builder.Services.AddScoped<ICartService, CartService>();
 
 var app = builder.Build();
 

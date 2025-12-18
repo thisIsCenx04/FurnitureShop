@@ -1,0 +1,93 @@
+﻿@model FurnitureShop.ViewModels.Cart.CartSummaryVm
+
+<h2>Giỏ hàng</h2>
+
+@if (TempData["CartError"] != null)
+{
+    <div class="alert alert-danger">@TempData["CartError"]</div>
+}
+@if (TempData["CartMsg"] != null)
+{
+    <div class="alert alert-success">@TempData["CartMsg"]</div>
+}
+
+@if (!Model.Items.Any())
+{
+    <p>Giỏ hàng trống.</p>
+    <a class="btn btn-primary" href="/products">Mua sắm</a>
+    return;
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th width="160">Số lượng</th>
+            <th>Tạm tính</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var it in Model.Items)
+        {
+            <tr>
+                <td>
+                    <a href="/products/@it.ProductSlug">@it.ProductName</a>
+                    <div class="text-muted small">
+                        Còn: @it.Stock
+                    </div>
+                    @if (it.Stock <= 0)
+                    {
+                        <span class="badge bg-danger">Hết hàng</span>
+                    }
+
+                </td>
+                <td>@it.UnitPrice.ToString("n0") đ</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm qty-btn"
+                                data-id="@it.CartItemId"
+                                data-delta="-1"
+                                @(it.Quantity <= 1 ? "disabled" : "")>
+                            −
+                        </button>
+
+                        <input type="text"
+                               class="form-control text-center"
+                               style="width:60px"
+                               value="@it.Quantity"
+                               readonly />
+
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm qty-btn"
+                                data-id="@it.CartItemId"
+                                data-delta="1"
+                                @(it.Quantity >= it.Stock ? "disabled" : "")>
+                            +
+                        </button>
+                    </div>
+                </td>
+
+                <td>@it.LineTotal.ToString("n0") đ</td>
+                <td>
+                    <form method="post" action="/cart/remove">
+                        <input type="hidden" name="cartItemId" value="@it.CartItemId" />
+                        <button class="btn btn-outline-danger">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-end">
+    <div style="min-width:320px;">
+        <div class="d-flex justify-content-between">
+            <span>Tạm tính</span>
+            <strong>@Model.Subtotal.ToString("n0") đ</strong>
+        </div>
+        <a class="btn btn-primary w-100 mt-3" href="/checkout">Thanh toán (COD)</a>
+    </div>
+</div>
