@@ -34,3 +34,25 @@ document.addEventListener("click", function (e) {
     const isOpen = item.classList.toggle("open");
     children.style.display = isOpen ? "block" : "none";
 }, true);
+
+document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".qty-btn");
+    if (!btn) return;
+
+    const cartItemId = btn.dataset.id;
+    const delta = parseInt(btn.dataset.delta, 10);
+
+    const input = btn.parentElement.querySelector("input");
+    let qty = parseInt(input.value, 10) + delta;
+
+    if (qty < 1) qty = 1;
+
+    fetch("/cart/update", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `cartItemId=${cartItemId}&qty=${qty}`
+    })
+        .then(() => location.reload());
+});

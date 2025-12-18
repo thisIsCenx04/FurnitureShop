@@ -59,8 +59,12 @@
             <div><b>Tồn kho:</b> @Model.Stock</div>
         </div>
 
-        <!-- Module 3 sẽ gắn AddToCart ở đây -->
-        <button class="btn btn-primary" disabled>Thêm vào giỏ (Module 3)</button>
+        <form method="post" action="/cart/add" class="d-flex gap-2">
+            <input type="hidden" name="productId" value="@Model.Id" />
+            <input type="number" class="form-control" name="qty" value="1" min="1" max="@Model.Stock" style="width:120px;" />
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+            <button class="btn btn-primary">Thêm vào giỏ</button>
+        </form>
 
         @if (!string.IsNullOrWhiteSpace(Model.Description))
         {
