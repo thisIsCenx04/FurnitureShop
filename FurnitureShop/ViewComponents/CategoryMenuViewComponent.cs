@@ -21,10 +21,9 @@ public sealed class CategoryMenuViewComponent : ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        var categories = await _db.Categories
+        var nodes = await _db.Categories
             .AsNoTracking()
             .Where(c => c.IsActive)
-            .OrderBy(c => c.Name)
             .Select(c => new Node
             {
                 Id = c.Id,
@@ -34,11 +33,10 @@ public sealed class CategoryMenuViewComponent : ViewComponent
             })
             .ToListAsync();
 
-        // build tree
-        var dict = categories.ToDictionary(x => x.Id);
+        var dict = nodes.ToDictionary(x => x.Id);
         var roots = new List<Node>();
 
-        foreach (var n in categories)
+        foreach (var n in nodes)
         {
             if (n.ParentId.HasValue && dict.TryGetValue(n.ParentId.Value, out var parent))
                 parent.Children.Add(n);
@@ -46,10 +44,18 @@ public sealed class CategoryMenuViewComponent : ViewComponent
                 roots.Add(n);
         }
 
-        // sort children
-        foreach (var r in roots)
-            r.Children = r.Children.OrderBy(x => x.Name).ToList();
+        // sort all levels
+        SortTree(roots);
 
         return View(roots);
+    }
+
+    private static void SortTree(List<Node> list)
+    {
+        list.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
+        foreach (var n in list)
+        {
+            SortTree(n.Children);
+        }
     }
 }

@@ -3,3 +3,34 @@
 
 // Write your JavaScript code.
 console.log("site.js loaded");
+// Toggle category tree inside bootstrap dropdown
+// ===== Category tree toggle (works inside Bootstrap dropdown/navbar collapse) =====
+// Prevent dropdown from closing when clicking inside
+document.addEventListener("click", function (e) {
+    if (e.target.closest(".dropdown-menu")) {
+        e.stopPropagation();
+    }
+});
+
+// Toggle category children (works inside dropdown)
+document.addEventListener("click", function (e) {
+    const toggle = e.target.closest(".cat-toggle");
+    const row = e.target.closest(".cat-row");
+
+    // click link thì cho đi link
+    if (e.target.closest("a.cat-link")) return;
+
+    if (!toggle && !row) return;
+
+    const item = (toggle || row).closest(".cat-item");
+    if (!item) return;
+
+    const children = item.querySelector(":scope > ul.cat-children");
+    if (!children) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isOpen = item.classList.toggle("open");
+    children.style.display = isOpen ? "block" : "none";
+}, true);

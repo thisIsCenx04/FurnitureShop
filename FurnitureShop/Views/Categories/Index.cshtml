@@ -1,0 +1,17 @@
+﻿@model List<FurnitureShop.Helpers.CategoryTreeHelper.FlatCategory>
+
+@{
+    ViewData["Title"] = "Danh mục";
+}
+
+<h2 class="mb-3">Danh mục</h2>
+
+<div class="list-group">
+    @foreach (var c in Model)
+    {
+        var prefix = new string('-', c.Level * 2);
+        <a class="list-group-item list-group-item-action" href="/products?category=@c.Slug">
+            @prefix @c.Name
+        </a>
+    }
+</div>

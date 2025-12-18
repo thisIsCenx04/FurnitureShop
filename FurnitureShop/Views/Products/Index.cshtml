@@ -1,0 +1,275 @@
+﻿@model FurnitureShop.ViewModels.Products.ProductListVm
+@using FurnitureShop.Helpers
+
+@{
+    ViewData["Title"] = "Sản phẩm";
+    string placeholder = "/images/placeholder.png";
+}
+
+<h2 class="mb-3">Sản phẩm</h2>
+
+@{
+    var selected = (Model.Filter.Categories ?? new List<string>())
+        .Where(x => !string.IsNullOrWhiteSpace(x))
+        .Distinct()
+        .ToList();
+}
+
+<label class="form-label">Danh mục</label>
+
+<!-- Hidden inputs để submit list Categories -->
+<div id="catHiddenInputs">
+    @foreach (var slug in selected)
+    {
+        <input type="hidden" name="Categories" value="@slug" />
+    }
+</div>
+
+<!-- Tags -->
+<div class="mb-2" id="catTags">
+    @if (selected.Any())
+    {
+        foreach (var slug in selected)
+        {
+            var name = slug;
+            // nếu bạn có map slug->name trong VM thì hiển thị đẹp hơn (mình sẽ set ở dưới)
+            <span class="badge text-bg-primary me-1 mb-1 cat-tag" data-slug="@slug">
+                @name <button type="button" class="btn btn-sm btn-link text-white p-0 ms-1 cat-tag-remove" style="text-decoration:none;">×</button>
+            </span>
+        }
+    }
+</div>
+
+<!-- Dropdown checklist -->
+<div class="dropdown">
+    <button class="form-select text-start d-flex justify-content-between align-items-center"
+            type="button"
+            data-bs-toggle="dropdown">
+        <span>Chọn danh mục</span>
+    </button>
+
+    <div class="dropdown-menu w-100 p-2" style="max-height:300px; overflow:auto;">
+        @foreach (var root in Model.CategoryTree)
+        {
+            @await Html.PartialAsync("_CategoryMultiCheckNode", root, new ViewDataDictionary(ViewData)
+            {
+            ["Level"] = 0,
+                ["SelectedSlugs"] = selected
+                })
+                }
+    </div>
+</div>
+
+<form method="get" action="/products" class="border rounded p-3 mb-4">
+    <div class="row g-3">
+        <div class="col-12 col-md-4">
+            <label class="form-label">Từ khoá</label>
+            <input class="form-control" name="q" value="@Model.Filter.Q" placeholder="Tên sản phẩm..." />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <label class="form-label">Danh mục</label>
+            <select class="form-select" name="category">
+                <option value="">-- Tất cả --</option>
+                @foreach (var c in Model.Categories)
+                {
+                    var selected = (Model.Filter.Category == c.Slug) ? "selected" : "";
+                    var prefix = new string('-', c.Level * 2);
+                    <option value="@c.Slug" selected="@selected">@prefix @c.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <label class="form-label">Giá từ</label>
+            <input class="form-control" name="min" value="@(Model.Filter.Min?.ToString() ?? "")" />
+        </div>
+
+        <div class="col-6 col-md-2">
+            <label class="form-label">Giá đến</label>
+            <input class="form-control" name="max" value="@(Model.Filter.Max?.ToString() ?? "")" />
+        </div>
+
+        <div class="col-12 col-md-3">
+            <label class="form-label">Chất liệu</label>
+            <select class="form-select" name="material">
+                <option value="">-- Tất cả --</option>
+                @foreach (var m in Model.Materials)
+                {
+                    <option value="@m" selected="@(Model.Filter.Material == m)">@m</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <label class="form-label">Phong cách</label>
+            <select class="form-select" name="style">
+                <option value="">-- Tất cả --</option>
+                @foreach (var s in Model.Styles)
+                {
+                    <option value="@s" selected="@(Model.Filter.Style == s)">@s</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <label class="form-label">Sắp xếp</label>
+            <select class="form-select" name="sort">
+                <option value="newest" selected="@(Model.Filter.Sort == "newest")">Mới nhất</option>
+                <option value="price_asc" selected="@(Model.Filter.Sort == "price_asc")">Giá tăng dần</option>
+                <option value="price_desc" selected="@(Model.Filter.Sort == "price_desc")">Giá giảm dần</option>
+                <option value="name_asc" selected="@(Model.Filter.Sort == "name_asc")">Tên A → Z</option>
+            </select>
+        </div>
+
+        <div class="col-12 col-md-3 d-flex align-items-end gap-2">
+            <button class="btn btn-primary w-100" type="submit">Lọc</button>
+            <a class="btn btn-outline-secondary" href="/products">Reset</a>
+        </div>
+    </div>
+</form>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div class="text-muted small">
+        Tổng: <b>@Model.TotalItems</b> sản phẩm
+    </div>
+</div>
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning">Không có sản phẩm phù hợp.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var p in Model.Items)
+        {
+            var img = string.IsNullOrWhiteSpace(p.MainImageUrl) ? placeholder : p.MainImageUrl;
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card h-100">
+                    <a href="/products/@p.Slug">
+                        <img class="card-img-top" src="@img" alt="@p.Name" style="aspect-ratio: 4/3; object-fit: cover;" />
+                    </a>
+                    <div class="card-body">
+                        <div class="small text-muted">@p.CategoryName</div>
+                        <a class="text-decoration-none fw-semibold d-block" href="/products/@p.Slug">@p.Name</a>
+
+                        <div class="mt-2">
+                            @if (p.SalePrice.HasValue)
+                            {
+                                <div class="text-decoration-line-through text-muted small">@p.Price.ToVnd()</div>
+                                <div class="fw-bold">@p.SalePrice.Value.ToVnd()</div>
+                            }
+                            else
+                            {
+                                <div class="fw-bold">@p.Price.ToVnd()</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination">
+            @{
+                int page = Model.Filter.Page;
+                int totalPages = Model.TotalPages;
+
+                string BuildUrl(int p) =>
+                $"/products?category={Model.Filter.Category}&q={Model.Filter.Q}&min={Model.Filter.Min}&max={Model.Filter.Max}&material={Model.Filter.Material}&style={Model.Filter.Style}&sort={Model.Filter.Sort}&page={p}&pageSize={Model.Filter.PageSize}";
+            }
+
+            <li class="page-item @(Model.Filter.Page <= 1 ? "disabled" : "")">
+                <a class="page-link" href="@BuildUrl(page - 1)">Prev</a>
+            </li>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == page ? "active" : "")">
+                    <a class="page-link" href="@BuildUrl(i)">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.Filter.Page >= totalPages ? "disabled" : "")">
+                <a class="page-link" href="@BuildUrl(page + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+}
+@section Scripts {
+    <script>
+        (function () {
+          function rebuildHiddenInputs(values) {
+            const wrap = document.getElementById("catHiddenInputs");
+            wrap.innerHTML = "";
+            values.forEach(v => {
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = "Categories";
+              input.value = v;
+              wrap.appendChild(input);
+            });
+          }
+
+          function rebuildTags(items) {
+            // items: [{slug, name}]
+            const wrap = document.getElementById("catTags");
+            wrap.innerHTML = "";
+
+            items.forEach(it => {
+              const span = document.createElement("span");
+              span.className = "badge text-bg-primary me-1 mb-1 cat-tag";
+              span.dataset.slug = it.slug;
+              span.innerHTML = `${it.name} <button type="button" class="btn btn-sm btn-link text-white p-0 ms-1 cat-tag-remove" style="text-decoration:none;">×</button>`;
+              wrap.appendChild(span);
+            });
+          }
+
+          function getSelectedFromChecks() {
+            const checks = Array.from(document.querySelectorAll(".cat-check:checked"));
+            const items = checks.map(c => ({ slug: c.value, name: c.dataset.name || c.value }));
+            // unique by slug
+            const map = new Map();
+            items.forEach(it => map.set(it.slug, it));
+            return Array.from(map.values());
+          }
+
+          // checkbox change => update hidden + tags
+          document.addEventListener("change", function (e) {
+            const el = e.target;
+            if (!el.classList.contains("cat-check")) return;
+
+            const items = getSelectedFromChecks();
+            rebuildHiddenInputs(items.map(x => x.slug));
+            rebuildTags(items);
+          });
+
+          // click remove tag => uncheck checkbox + update
+          document.addEventListener("click", function (e) {
+            const btn = e.target.closest(".cat-tag-remove");
+            if (!btn) return;
+
+            const tag = btn.closest(".cat-tag");
+            const slug = tag?.dataset?.slug;
+            if (!slug) return;
+
+            const cb = document.querySelector(`.cat-check[value="${CSS.escape(slug)}"]`);
+            if (cb) cb.checked = false;
+
+            const items = getSelectedFromChecks();
+            rebuildHiddenInputs(items.map(x => x.slug));
+            rebuildTags(items);
+          });
+
+          // Init tags text đúng theo checkbox dataset-name (sửa việc tag đang hiển thị slug)
+          const initItems = getSelectedFromChecks();
+          rebuildTags(initItems);
+        })();
+    </script>
+}
