@@ -1,0 +1,30 @@
+﻿@model FurnitureShop.ViewModels.Products.CategoryNodeVm
+@{
+    var level = (int)(ViewData["Level"] ?? 0);
+    var padding = 8 + level * 14;
+    var selectedSlugs = (List<string>)(ViewData["SelectedSlugs"] ?? new List<string>());
+    var isChecked = selectedSlugs.Contains(Model.Slug);
+    var hasChildren = Model.Children != null && Model.Children.Count > 0;
+}
+
+<div class="d-flex align-items-center py-1" style="padding-left:@(padding)px;">
+    <input class="form-check-input me-2 cat-check"
+           type="checkbox"
+           value="@Model.Slug"
+           data-name="@Model.Name"
+           @(isChecked ? "checked" : "") />
+
+    <span>@Model.Name</span>
+</div>
+
+@if (hasChildren)
+{
+    foreach (var child in Model.Children)
+    {
+        @await Html.PartialAsync("_CategoryMultiCheckNode", child, new ViewDataDictionary(ViewData)
+        {
+        ["Level"] = level + 1,
+            ["SelectedSlugs"] = selectedSlugs
+        })
+    }
+}

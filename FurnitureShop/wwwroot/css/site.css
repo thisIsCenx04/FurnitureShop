@@ -5,3 +5,22 @@ body {
 .card {
     border-radius: 12px;
 }
+.cat-tree .cat-row {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-radius: 8px;
+}
+
+    .cat-tree .cat-row:hover {
+        background: #f6f7f8;
+    }
+
+.cat-tree .cat-toggle {
+    width: 28px;
+    height: 28px;
+    line-height: 1;
+}
+
+.cat-tree .cat-item.open > .cat-row .cat-toggle {
+    transform: rotate(90deg);
+}
