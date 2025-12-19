@@ -19,6 +19,8 @@ public sealed class ProductsController : Controller
         if (filter.Page <= 0) filter.Page = 1;
         if (filter.PageSize <= 0 || filter.PageSize > 60) filter.PageSize = 12;
 
+        filter.Category = string.IsNullOrWhiteSpace(filter.Category) ? null : filter.Category.Trim();
+
         // Load categories (active) phục vụ:
         // - menu filter select
         // - resolve category slug -> id

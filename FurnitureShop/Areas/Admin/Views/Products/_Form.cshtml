@@ -1,0 +1,120 @@
+﻿@model FurnitureShop.ViewModels.Admin.Products.ProductEditPageVm
+
+@{
+    var isEdit = Model.Form?.Id > 0;
+}
+
+<form asp-area="Admin"
+      asp-controller="Products"
+      asp-action="@(isEdit ? "Edit" : "Create")"
+      asp-route-id="@(isEdit ? Model.Form.Id : null)"
+      method="post"
+      enctype="multipart/form-data">
+
+    @Html.AntiForgeryToken()
+
+    <!-- QUAN TRỌNG: để POST Edit bind được Form.Id -->
+    <input type="hidden" asp-for="Form.Id" />
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary()
+        </div>
+    }
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.Name"></label>
+            <input class="form-control" asp-for="Form.Name" />
+            <span class="text-danger" asp-validation-for="Form.Name"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.CategoryId"></label>
+            <select class="form-select" asp-for="Form.CategoryId" asp-items="Model.Categories"></select>
+            <span class="text-danger" asp-validation-for="Form.CategoryId"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.Price"></label>
+            <input class="form-control" asp-for="Form.Price" />
+            <span class="text-danger" asp-validation-for="Form.Price"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.SalePrice"></label>
+            <input class="form-control" asp-for="Form.SalePrice" />
+            <span class="text-danger" asp-validation-for="Form.SalePrice"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.Stock"></label>
+            <input class="form-control" asp-for="Form.Stock" />
+            <span class="text-danger" asp-validation-for="Form.Stock"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.IsActive"></label>
+            <select class="form-select" asp-for="Form.IsActive">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+            <span class="text-danger" asp-validation-for="Form.IsActive"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.MainImageFile">Main image</label>
+            <input class="form-control" type="file" asp-for="Form.MainImageFile" />
+            <span class="text-danger" asp-validation-for="Form.MainImageFile"></span>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Form.CurrentMainImageUrl))
+            {
+                <img src="@Model.Form.CurrentMainImageUrl"
+                     style="margin-top:8px;width:120px;height:120px;object-fit:cover;border-radius:8px" />
+            }
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.GalleryFiles">Gallery images</label>
+            <input class="form-control" type="file" asp-for="Form.GalleryFiles" multiple />
+            <small class="text-muted">Có thể chọn nhiều ảnh.</small>
+            <span class="text-danger" asp-validation-for="Form.GalleryFiles"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.ShortDescription"></label>
+            <textarea class="form-control" asp-for="Form.ShortDescription" rows="2"></textarea>
+            <span class="text-danger" asp-validation-for="Form.ShortDescription"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.Description"></label>
+            <textarea class="form-control" asp-for="Form.Description" rows="6"></textarea>
+            <span class="text-danger" asp-validation-for="Form.Description"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.Material"></label>
+            <input class="form-control" asp-for="Form.Material" />
+            <span class="text-danger" asp-validation-for="Form.Material"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.Style"></label>
+            <input class="form-control" asp-for="Form.Style" />
+            <span class="text-danger" asp-validation-for="Form.Style"></span>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label" asp-for="Form.Dimensions"></label>
+            <input class="form-control" asp-for="Form.Dimensions" />
+            <span class="text-danger" asp-validation-for="Form.Dimensions"></span>
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Lưu</button>
+        <a class="btn btn-secondary" asp-area="Admin" asp-controller="Products" asp-action="Index">Quay lại</a>
+    </div>
+</form>

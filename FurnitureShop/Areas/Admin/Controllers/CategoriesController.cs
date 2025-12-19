@@ -53,12 +53,16 @@ public sealed class CategoriesController : Controller
         vm.Slug = (vm.Slug ?? "").Trim();
         vm.Name = (vm.Name ?? "").Trim();
 
-        if (string.IsNullOrWhiteSpace(vm.Slug) && !string.IsNullOrWhiteSpace(vm.Name))
-            vm.Slug = SlugHelper.GenerateSlug(vm.Name);
+        vm.Name = (vm.Name ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(vm.Name))
+            ModelState.AddModelError(nameof(vm.Name), "Tên không được để trống.");
 
-        // validate slug unique
-        if (await _db.Categories.AsNoTracking().AnyAsync(x => x.Slug == vm.Slug))
-            ModelState.AddModelError(nameof(vm.Slug), "Slug đã tồn tại. Vui lòng chọn slug khác.");
+        vm.Slug = await SlugHelper.GenerateUniqueSlugAsync(
+            _db.Categories,
+            vm.Name,
+            x => x.Slug,
+            x => x.Id
+        );
 
         // parent cannot be itself (create: không có Id)
         // parent cycle: create chưa thể có cycle, nhưng vẫn check ParentId tồn tại
@@ -124,12 +128,16 @@ public sealed class CategoriesController : Controller
         vm.Slug = (vm.Slug ?? "").Trim();
         vm.Name = (vm.Name ?? "").Trim();
 
-        if (string.IsNullOrWhiteSpace(vm.Slug) && !string.IsNullOrWhiteSpace(vm.Name))
-            vm.Slug = SlugHelper.GenerateSlug(vm.Name);
+        if (string.IsNullOrWhiteSpace(vm.Name))
+            ModelState.AddModelError(nameof(vm.Name), "Tên không được để trống.");
 
-        // slug unique (exclude self)
-        if (await _db.Categories.AsNoTracking().AnyAsync(x => x.Slug == vm.Slug && x.Id != id))
-            ModelState.AddModelError(nameof(vm.Slug), "Slug đã tồn tại. Vui lòng chọn slug khác.");
+        vm.Slug = await SlugHelper.GenerateUniqueSlugAsync(
+            _db.Categories,
+            vm.Name,
+            x => x.Slug,
+            x => x.Id,
+            excludeId: id
+        );
 
         // parent cannot be itself
         if (vm.ParentId.HasValue && vm.ParentId.Value == id)

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using FurnitureShop.Services.Auth;
 using FurnitureShop.Services.Cart;
+using FurnitureShop.Services.Upload;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 //Cart service
 builder.Services.AddScoped<ICartService, CartService>();
+
+//Cloudinary service
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 var app = builder.Build();
 
