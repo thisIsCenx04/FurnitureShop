@@ -1,0 +1,24 @@
+﻿<h2>Tra cứu đơn hàng</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form method="post" action="/orders/track" class="row g-3">
+    @Html.AntiForgeryToken()
+
+    <div class="col-md-4">
+        <label class="form-label">Mã đơn (OrderCode)</label>
+        <input class="form-control" name="orderCode" />
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Số điện thoại</label>
+        <input class="form-control" name="phone" />
+    </div>
+
+    <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Tra cứu</button>
+    </div>
+</form>
