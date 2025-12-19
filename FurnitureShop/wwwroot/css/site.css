@@ -24,3 +24,11 @@ body {
 .cat-tree .cat-item.open > .cat-row .cat-toggle {
     transform: rotate(90deg);
 }
+
+.dropdown-menu {
+    z-index: 2000;
+}
+
+header, .navbar, .container, .container-fluid {
+    overflow: visible !important;
+}
