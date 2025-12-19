@@ -10,7 +10,6 @@ public sealed class CategoryFormVm
     [StringLength(200)]
     public string Name { get; set; } = "";
 
-    [Required(ErrorMessage = "Slug không được để trống")]
     [StringLength(200)]
     public string Slug { get; set; } = "";
 

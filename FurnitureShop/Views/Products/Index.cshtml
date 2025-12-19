@@ -4,80 +4,58 @@
 @{
     ViewData["Title"] = "Sản phẩm";
     string placeholder = "/images/placeholder.png";
-}
 
-<h2 class="mb-3">Sản phẩm</h2>
-
-@{
-    var selected = (Model.Filter.Categories ?? new List<string>())
+    var selectedCats = (Model.Filter.Categories ?? new List<string>())
         .Where(x => !string.IsNullOrWhiteSpace(x))
         .Distinct()
         .ToList();
 }
 
-<label class="form-label">Danh mục</label>
-
-<!-- Hidden inputs để submit list Categories -->
-<div id="catHiddenInputs">
-    @foreach (var slug in selected)
-    {
-        <input type="hidden" name="Categories" value="@slug" />
-    }
-</div>
-
-<!-- Tags -->
-<div class="mb-2" id="catTags">
-    @if (selected.Any())
-    {
-        foreach (var slug in selected)
-        {
-            var name = slug;
-            // nếu bạn có map slug->name trong VM thì hiển thị đẹp hơn (mình sẽ set ở dưới)
-            <span class="badge text-bg-primary me-1 mb-1 cat-tag" data-slug="@slug">
-                @name <button type="button" class="btn btn-sm btn-link text-white p-0 ms-1 cat-tag-remove" style="text-decoration:none;">×</button>
-            </span>
-        }
-    }
-</div>
-
-<!-- Dropdown checklist -->
-<div class="dropdown">
-    <button class="form-select text-start d-flex justify-content-between align-items-center"
-            type="button"
-            data-bs-toggle="dropdown">
-        <span>Chọn danh mục</span>
-    </button>
-
-    <div class="dropdown-menu w-100 p-2" style="max-height:300px; overflow:auto;">
-        @foreach (var root in Model.CategoryTree)
-        {
-            @await Html.PartialAsync("_CategoryMultiCheckNode", root, new ViewDataDictionary(ViewData)
-            {
-            ["Level"] = 0,
-                ["SelectedSlugs"] = selected
-                })
-                }
-    </div>
-</div>
+<h2 class="mb-3">Sản phẩm</h2>
 
 <form method="get" action="/products" class="border rounded p-3 mb-4">
     <div class="row g-3">
-        <div class="col-12 col-md-4">
-            <label class="form-label">Từ khoá</label>
-            <input class="form-control" name="q" value="@Model.Filter.Q" placeholder="Tên sản phẩm..." />
+        <!-- Danh mục (multi) -->
+        <div class="col-12">
+            <label class="form-label">Danh mục</label>
+
+            <!-- Hidden inputs để submit list Categories -->
+            <div id="catHiddenInputs">
+                @foreach (var slug in selectedCats)
+                {
+                    <input type="hidden" name="Categories" value="@slug" />
+                }
+            </div>
+
+            <div class="d-flex flex-column gap-2">
+                <!-- Tags (giới hạn chiều cao để không làm tuột layout) -->
+                <div id="catTags" class="cat-tags-box"></div>
+
+                <!-- Dropdown checklist -->
+                <div class="dropdown">
+                    <button class="form-select text-start d-flex justify-content-between align-items-center"
+                            type="button"
+                            data-bs-toggle="dropdown">
+                        <span>Chọn danh mục</span>
+                    </button>
+
+                    <div class="dropdown-menu w-100 p-2" style="max-height:300px; overflow:auto;">
+                        @foreach (var root in Model.CategoryTree)
+                        {
+                            @await Html.PartialAsync("_CategoryMultiCheckNode", root, new ViewDataDictionary(ViewData)
+                            {
+                            ["Level"] = 0,
+                                                ["SelectedSlugs"] = selectedCats
+                                                })
+                                                }
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="col-12 col-md-4">
-            <label class="form-label">Danh mục</label>
-            <select class="form-select" name="category">
-                <option value="">-- Tất cả --</option>
-                @foreach (var c in Model.Categories)
-                {
-                    var selected = (Model.Filter.Category == c.Slug) ? "selected" : "";
-                    var prefix = new string('-', c.Level * 2);
-                    <option value="@c.Slug" selected="@selected">@prefix @c.Name</option>
-                }
-            </select>
+            <label class="form-label">Từ khoá</label>
+            <input class="form-control" name="q" value="@Model.Filter.Q" placeholder="Tên sản phẩm..." />
         </div>
 
         <div class="col-6 col-md-2">
@@ -149,7 +127,10 @@ else
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="card h-100">
                     <a href="/products/@p.Slug">
-                        <img class="card-img-top" src="@img" alt="@p.Name" style="aspect-ratio: 4/3; object-fit: cover;" />
+                        <img class="card-img-top"
+                             src="@img"
+                             alt="@p.Name"
+                             style="aspect-ratio: 4/3; object-fit: cover;" />
                     </a>
                     <div class="card-body">
                         <div class="small text-muted">@p.CategoryName</div>
@@ -181,8 +162,28 @@ else
                 int page = Model.Filter.Page;
                 int totalPages = Model.TotalPages;
 
-                string BuildUrl(int p) =>
-                $"/products?category={Model.Filter.Category}&q={Model.Filter.Q}&min={Model.Filter.Min}&max={Model.Filter.Max}&material={Model.Filter.Material}&style={Model.Filter.Style}&sort={Model.Filter.Sort}&page={p}&pageSize={Model.Filter.PageSize}";
+                string Encode(string? s) => Uri.EscapeDataString(s ?? "");
+
+                string BuildUrl(int p)
+                {
+                    var qs = new List<string>();
+
+                    var cats = Model.Filter.Categories ?? new List<string>();
+                    foreach (var c in cats.Where(x => !string.IsNullOrWhiteSpace(x)))
+                        qs.Add($"Categories={Encode(c)}");
+
+                    if (!string.IsNullOrWhiteSpace(Model.Filter.Q)) qs.Add($"q={Encode(Model.Filter.Q)}");
+                    if (Model.Filter.Min.HasValue) qs.Add($"min={Model.Filter.Min.Value}");
+                    if (Model.Filter.Max.HasValue) qs.Add($"max={Model.Filter.Max.Value}");
+                    if (!string.IsNullOrWhiteSpace(Model.Filter.Material)) qs.Add($"material={Encode(Model.Filter.Material)}");
+                    if (!string.IsNullOrWhiteSpace(Model.Filter.Style)) qs.Add($"style={Encode(Model.Filter.Style)}");
+                    if (!string.IsNullOrWhiteSpace(Model.Filter.Sort)) qs.Add($"sort={Encode(Model.Filter.Sort)}");
+
+                    qs.Add($"page={p}");
+                    qs.Add($"pageSize={Model.Filter.PageSize}");
+
+                    return "/products?" + string.Join("&", qs);
+                }
             }
 
             <li class="page-item @(Model.Filter.Page <= 1 ? "disabled" : "")">
@@ -202,6 +203,31 @@ else
         </ul>
     </nav>
 }
+
+<!-- ✅ CSS để tags gọn + không tuột layout (không dùng section Styles để tránh lỗi) -->
+<style>
+    .cat-tags-box {
+        display: none; /* bật khi có items */
+        max-height: 72px;
+        overflow: auto;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 2px 0;
+    }
+
+        .cat-tags-box .badge {
+            font-size: .825rem;
+            line-height: 1.2;
+            padding: .35rem .55rem;
+            border-radius: 999px;
+        }
+
+        .cat-tags-box .cat-tag-remove {
+            font-size: 1rem;
+            line-height: 1;
+        }
+</style>
+
 @section Scripts {
     <script>
         (function () {
@@ -218,15 +244,22 @@ else
           }
 
           function rebuildTags(items) {
-            // items: [{slug, name}]
             const wrap = document.getElementById("catTags");
             wrap.innerHTML = "";
 
+            if (!items.length) {
+              wrap.style.display = "none";
+              return;
+            }
+
+            wrap.style.display = "flex";
+
             items.forEach(it => {
               const span = document.createElement("span");
-              span.className = "badge text-bg-primary me-1 mb-1 cat-tag";
+              span.className = "badge text-bg-primary cat-tag";
               span.dataset.slug = it.slug;
-              span.innerHTML = `${it.name} <button type="button" class="btn btn-sm btn-link text-white p-0 ms-1 cat-tag-remove" style="text-decoration:none;">×</button>`;
+              span.innerHTML =
+                `${it.name} <button type="button" class="btn btn-sm btn-link text-white p-0 ms-2 cat-tag-remove" style="text-decoration:none;">×</button>`;
               wrap.appendChild(span);
             });
           }
@@ -234,13 +267,12 @@ else
           function getSelectedFromChecks() {
             const checks = Array.from(document.querySelectorAll(".cat-check:checked"));
             const items = checks.map(c => ({ slug: c.value, name: c.dataset.name || c.value }));
-            // unique by slug
+
             const map = new Map();
             items.forEach(it => map.set(it.slug, it));
             return Array.from(map.values());
           }
 
-          // checkbox change => update hidden + tags
           document.addEventListener("change", function (e) {
             const el = e.target;
             if (!el.classList.contains("cat-check")) return;
@@ -250,7 +282,6 @@ else
             rebuildTags(items);
           });
 
-          // click remove tag => uncheck checkbox + update
           document.addEventListener("click", function (e) {
             const btn = e.target.closest(".cat-tag-remove");
             if (!btn) return;
@@ -267,7 +298,7 @@ else
             rebuildTags(items);
           });
 
-          // Init tags text đúng theo checkbox dataset-name (sửa việc tag đang hiển thị slug)
+          // Init
           const initItems = getSelectedFromChecks();
           rebuildTags(initItems);
         })();

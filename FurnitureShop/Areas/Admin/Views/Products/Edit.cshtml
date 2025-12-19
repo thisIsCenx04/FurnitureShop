@@ -1,0 +1,42 @@
+﻿@model FurnitureShop.ViewModels.Admin.Products.ProductEditPageVm
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+}
+<h3>Sửa sản phẩm</h3>
+@await Html.PartialAsync("_Form", Model)
+
+@if (Model.Gallery.Count > 0)
+{
+    <hr />
+    <h5>Gallery</h5>
+
+    <div class="row g-3">
+        @foreach (var img in Model.Gallery)
+        {
+            <div class="col-6 col-md-3">
+                <div class="card">
+                    <img src="@img.Url" class="card-img-top" style="height:160px;object-fit:cover" />
+                    <div class="card-body">
+                        <div class="d-flex gap-2">
+                            <form method="post" action="/Admin/Products/SetPrimaryImage" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@Model.Form.Id" />
+                                <input type="hidden" name="imageId" value="@img.Id" />
+                                <button class="btn btn-sm @(img.IsPrimary ? "btn-success" : "btn-outline-success")" type="submit">
+                                    @(img.IsPrimary ? "Primary" : "Set primary")
+                                </button>
+                            </form>
+
+                            <form method="post" action="/Admin/Products/DeleteGalleryImage" class="d-inline" onsubmit="return confirm('Xoá ảnh này?')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@Model.Form.Id" />
+                                <input type="hidden" name="imageId" value="@img.Id" />
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Xoá</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
