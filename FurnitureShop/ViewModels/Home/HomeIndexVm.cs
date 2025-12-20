@@ -1,6 +1,6 @@
 ﻿using FurnitureShop.Models.Entities;
 
-namespace FurnitureShop.ViewModels;
+namespace FurnitureShop.ViewModels.Home;
 
 public sealed class HomeIndexVm
 {

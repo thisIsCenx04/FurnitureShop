@@ -1,55 +1,77 @@
-﻿@model FurnitureShop.ViewModels.HomeIndexVm
+﻿@model FurnitureShop.ViewModels.Home.HomeIndexVm
 @using FurnitureShop.Helpers
 
-<div class="py-4">
-    <h1 class="mb-3">FurnitureShop</h1>
-    <p class="text-muted mb-4">Demo core module: layout + seed + dbcontext + helpers</p>
+@{
+    ViewData["Title"] = "Trang chủ";
+    string placeholder = "/images/placeholder.png";
+}
 
-    <h4>Danh mục nổi bật</h4>
-    <div class="row g-3 mb-4">
-        @foreach (var c in Model.Categories)
-        {
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="border rounded p-3 h-100">
+<h1 class="display-4 mb-4">FurnitureShop</h1>
+
+<h3 class="fw-semibold mb-3">Danh mục nổi bật</h3>
+
+<div class="row g-3 mb-5">
+    @foreach (var c in Model.Categories)
+    {
+        var url = $"/products?Categories={Uri.EscapeDataString(c.Slug)}";
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 position-relative">
+                <div class="card-body">
                     <div class="fw-semibold">@c.Name</div>
                     <div class="text-muted small">@c.Slug</div>
-                    <a class="btn btn-sm btn-outline-primary mt-2" href="/products?category=@c.Slug">
+
+                    <a class="btn btn-outline-primary mt-3" href="@url">
                         Xem sản phẩm
                     </a>
+
+                    <a class="stretched-link" href="@url"></a>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
+</div>
 
-    <h4>Sản phẩm mới</h4>
-    <div class="row g-3">
-        @foreach (var p in Model.Products)
-        {
-            var img = string.IsNullOrWhiteSpace(p.MainImageUrl)
-            ? "/images/placeholder.png"
-            : p.MainImageUrl;
+<h3 class="fw-semibold mb-3">Sản phẩm mới</h3>
 
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="card h-100">
-                    <img class="card-img-top" src="@img" alt="@p.Name" style="aspect-ratio: 4/3; object-fit: cover;" />
-                    <div class="card-body">
-                        <div class="fw-semibold">@p.Name</div>
-                        <div class="text-muted small">@p.Slug</div>
+<div class="row g-3">
+    @foreach (var p in Model.Products)
+    {
+        var img = string.IsNullOrWhiteSpace(p.MainImageUrl) ? placeholder : p.MainImageUrl;
+        var url = $"/products/{p.Slug}";
 
-                        <div class="mt-2">
-                            @if (p.SalePrice.HasValue)
-                            {
-                                <div class="text-decoration-line-through text-muted">@p.Price.ToVnd()</div>
-                                <div class="fw-bold">@p.SalePrice.Value.ToVnd()</div>
-                            }
-                            else
-                            {
-                                <div class="fw-bold">@p.Price.ToVnd()</div>
-                            }
-                        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 position-relative">
+                <img class="card-img-top"
+                     src="@img"
+                     alt="@p.Name"
+                     style="aspect-ratio:4/3; object-fit:cover;" />
+
+                <div class="card-body">
+                    <div class="fw-semibold text-truncate">@p.Name</div>
+                    <div class="text-muted small text-truncate">@p.Slug</div>
+
+                    <div class="mt-2">
+                        @if (p.SalePrice.HasValue)
+                        {
+                            <div class="text-decoration-line-through text-muted small">
+                                @p.Price.ToVnd()
+                            </div>
+                            <div class="fw-bold">
+                                @p.SalePrice.Value.ToVnd()
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="fw-bold">
+                                @p.Price.ToVnd()
+                            </div>
+                        }
                     </div>
+
+                    <a class="stretched-link" href="@url"></a>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
 </div>

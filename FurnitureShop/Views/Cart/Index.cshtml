@@ -18,34 +18,55 @@
     return;
 }
 
-<table class="table">
+<form id="af-token" method="post" class="d-none">
+    @Html.AntiForgeryToken()
+</form>
+
+<table class="table align-middle cart-table">
+    <colgroup>
+        <col style="width:90px" />
+        <col />
+        <col style="width:160px" />
+        <col style="width:180px" />
+        <col style="width:190px" />
+        <col style="width:100px" />
+    </colgroup>
     <thead>
         <tr>
+            <th>Ảnh</th>
             <th>Sản phẩm</th>
-            <th>Giá</th>
-            <th width="160">Số lượng</th>
-            <th>Tạm tính</th>
+            <th class="text-end">Giá</th>
+            <th class="text-center">Số lượng</th>
+            <th class="text-end">Tạm tính</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var it in Model.Items)
         {
+            var img = string.IsNullOrWhiteSpace(it.ImageUrl) ? "/images/placeholder.png" : it.ImageUrl;
+
             <tr>
                 <td>
-                    <a href="/products/@it.ProductSlug">@it.ProductName</a>
-                    <div class="text-muted small">
-                        Còn: @it.Stock
-                    </div>
+                    <a href="/products/@it.ProductSlug">
+                        <img src="@img" alt="@it.ProductName"
+                             style="width:72px;height:72px;object-fit:cover;border-radius:8px;" />
+                    </a>
+                </td>
+
+                <td class="product-cell">
+                    <a class="product-name" href="/products/@it.ProductSlug">@it.ProductName</a>
+                    <div class="text-muted small">Còn: @it.Stock</div>
                     @if (it.Stock <= 0)
                     {
                         <span class="badge bg-danger">Hết hàng</span>
                     }
-
                 </td>
-                <td>@it.UnitPrice.ToString("n0") đ</td>
-                <td>
-                    <div class="d-flex align-items-center gap-2">
+
+                <td class="money">@it.UnitPrice.ToString("n0") đ</td>
+
+                <td class="text-center">
+                    <div class="d-inline-flex align-items-center gap-2 qty-box">
                         <button type="button"
                                 class="btn btn-outline-secondary btn-sm qty-btn"
                                 data-id="@it.CartItemId"
@@ -55,8 +76,7 @@
                         </button>
 
                         <input type="text"
-                               class="form-control text-center"
-                               style="width:60px"
+                               class="form-control text-center qty-input"
                                value="@it.Quantity"
                                readonly />
 
@@ -70,9 +90,11 @@
                     </div>
                 </td>
 
-                <td>@it.LineTotal.ToString("n0") đ</td>
-                <td>
-                    <form method="post" action="/cart/remove">
+                <td class="money">@it.LineTotal.ToString("n0") đ</td>
+
+                <td class="text-end">
+                    <form method="post" action="/cart/remove" class="d-inline">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="cartItemId" value="@it.CartItemId" />
                         <button class="btn btn-outline-danger">Xóa</button>
                     </form>
@@ -83,10 +105,10 @@
 </table>
 
 <div class="d-flex justify-content-end">
-    <div style="min-width:320px;">
+    <div class="cart-summary">
         <div class="d-flex justify-content-between">
             <span>Tạm tính</span>
-            <strong>@Model.Subtotal.ToString("n0") đ</strong>
+            <strong class="money">@Model.Subtotal.ToString("n0") đ</strong>
         </div>
         <a class="btn btn-primary w-100 mt-3" href="/checkout">Thanh toán (COD)</a>
     </div>

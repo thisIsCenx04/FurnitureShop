@@ -6,57 +6,63 @@ namespace FurnitureShop.Controllers;
 
 public sealed class CartController : Controller
 {
-    private readonly ICartService _cart;
+    private readonly ICartService _cartService;
 
-    public CartController(ICartService cart) => _cart = cart;
-
-    private string? UserId => User.GetUserId(); // nếu bạn đã có ClaimsExtensions
-    // Nếu chưa có: bạn tự lấy Claim "uid"
+    public CartController(ICartService cartService) => _cartService = cartService;
 
     [HttpGet("/cart")]
     public async Task<IActionResult> Index()
     {
-        var cartKey = CartKeyHelper.GetOrCreateCartKey(HttpContext);
-        var vm = await _cart.GetOrCreateCartAsync(UserId, cartKey);
+        var cartKey = CartKeyHelper.GetOrSetCartKey(HttpContext);
+        var userId = User.GetUserIdOrNull();
+
+        var vm = await _cartService.GetOrCreateCartAsync(userId, cartKey);
         return View(vm);
     }
 
     [HttpPost("/cart/add")]
-    public async Task<IActionResult> AddToCart(int productId, int qty = 1, string? returnUrl = null)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Add(int productId, int qty = 1)
     {
-        var cartKey = CartKeyHelper.GetOrCreateCartKey(HttpContext);
+        var cartKey = CartKeyHelper.GetOrSetCartKey(HttpContext);
+        var userId = User.GetUserIdOrNull();
 
         try
         {
-            await _cart.AddToCartAsync(UserId, cartKey, productId, qty);
-            TempData["CartMsg"] = "Đã thêm vào giỏ hàng.";
+            await _cartService.AddToCartAsync(userId, cartKey, productId, qty);
+            TempData["Toast"] = "Đã thêm vào giỏ hàng.";
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
-            TempData["CartError"] = ex.Message;
+            TempData["ToastError"] = ex.Message;
         }
-
-        return Redirect(returnUrl ?? "/cart");
-    }
-
-
-    [HttpPost("/cart/update")]
-    public async Task<IActionResult> UpdateQty(long cartItemId, int qty)
-    {
-        var cartKey = CartKeyHelper.GetOrCreateCartKey(HttpContext);
-
-        await _cart.UpdateQtyAsync(UserId, cartKey, cartItemId, qty);
-        TempData["CartMsg"] = "Đã cập nhật số lượng (tối đa theo tồn kho).";
 
         return Redirect("/cart");
     }
 
+    [HttpPost("/cart/update")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Update(long cartItemId, int qty)
+    {
+        var cartKey = CartKeyHelper.GetOrSetCartKey(HttpContext);
+        var userId = User.GetUserIdOrNull();
+
+        await _cartService.UpdateQtyAsync(userId, cartKey, cartItemId, qty);
+        TempData["Toast"] = "Đã cập nhật số lượng (tối đa theo tồn kho).";
+
+        return Redirect("/cart");
+    }
 
     [HttpPost("/cart/remove")]
-    public async Task<IActionResult> RemoveItem(long cartItemId)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Remove(long cartItemId)
     {
-        var cartKey = CartKeyHelper.GetOrCreateCartKey(HttpContext);
-        await _cart.RemoveItemAsync(UserId, cartKey, cartItemId);
+        var cartKey = CartKeyHelper.GetOrSetCartKey(HttpContext);
+        var userId = User.GetUserIdOrNull();
+
+        await _cartService.RemoveItemAsync(userId, cartKey, cartItemId);
+        TempData["Toast"] = "Đã xóa sản phẩm khỏi giỏ.";
+
         return Redirect("/cart");
     }
 }

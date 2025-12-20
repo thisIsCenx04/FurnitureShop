@@ -20,8 +20,11 @@ public static class CartKeyHelper
             Secure = http.Request.IsHttps,
             Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
+
         return key;
     }
+
+    public static string GetOrSetCartKey(HttpContext http) => GetOrCreateCartKey(http);
 
     public static string? TryGetCartKey(HttpContext http)
         => http.Request.Cookies.TryGetValue(CookieName, out var key) ? key : null;

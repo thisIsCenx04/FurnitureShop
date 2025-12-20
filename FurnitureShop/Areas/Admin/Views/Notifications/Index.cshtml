@@ -1,0 +1,44 @@
+﻿@model List<FurnitureShop.Models.Entities.Notification>
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<h2>Notifications</h2>
+
+<table class="table table-sm align-middle">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Message</th>
+            <th>Time</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var n in Model)
+        {
+            <tr class="@(n.IsRead ? "" : "table-warning")">
+                <td class="fw-bold">@n.Title</td>
+                <td>
+                    @n.Message
+                    @if (!string.IsNullOrWhiteSpace(n.Url))
+                    {
+                        <div><a href="@n.Url">Mở</a></div>
+                    }
+                </td>
+                <td class="text-muted">@n.CreatedAt</td>
+                <td class="text-end">
+                    @if (!n.IsRead)
+                    {
+                        <form method="post" asp-action="MarkRead">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@n.Id" />
+                            <button class="btn btn-outline-secondary btn-sm">Đã đọc</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -5,6 +5,8 @@ body {
 .card {
     border-radius: 12px;
 }
+
+/* Tree category (multi-check) */
 .cat-tree .cat-row {
     padding-top: 6px;
     padding-bottom: 6px;
@@ -32,3 +34,46 @@ body {
 header, .navbar, .container, .container-fluid {
     overflow: visible !important;
 }
+
+/* CART */
+.cart-table {
+    table-layout: fixed;
+}
+
+    .cart-table .money {
+        text-align: right;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .cart-table .qty-box .qty-input {
+        width: 60px;
+    }
+
+    .cart-table .product-cell .product-name {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.cart-summary {
+    width: 360px;
+}
+
+/* FIX CLICK HOME CARDS (stretched-link overlay) */
+.card.position-relative,
+.card.position-relative * {
+    pointer-events: auto;
+}
+
+    .card.position-relative .stretched-link::after {
+        z-index: 1;
+    }
+
+    .card.position-relative .btn,
+    .card.position-relative a:not(.stretched-link) {
+        position: relative;
+        z-index: 2;
+    }

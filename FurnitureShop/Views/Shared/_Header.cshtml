@@ -28,28 +28,41 @@
                     @await Component.InvokeAsync("CategoryMenu") *@
                 </ul>
 
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <button class="btn btn-outline-primary btn-sm dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            @User.Identity!.Name
-                        </button>
+                <div class="d-flex gap-2 align-items-center">
 
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/account/profile">Tài khoản</a></li>
-                            <li><a class="dropdown-item" href="/orders">Lịch sử đặt hàng</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="post" action="/account/logout" class="px-3 py-1">
-                                    @Html.AntiForgeryToken()
-                                    <button class="btn btn-danger btn-sm w-100" type="submit">Đăng xuất</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                    <!-- Cart luôn hiển thị -->
+                    <a class="btn btn-outline-secondary btn-sm" href="/cart">
+                        Giỏ hàng
+                    </a>
+
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                @User.Identity!.Name
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/account/profile">Tài khoản</a></li>
+                                <li><a class="dropdown-item" href="/orders">Lịch sử đặt hàng</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="/account/logout" class="px-3 py-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-danger btn-sm w-100" type="submit">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary btn-sm" href="/account/login">Đăng nhập</a>
+                    }
+                </div>
             </div>
         </div>
     </nav>
