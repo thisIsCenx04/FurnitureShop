@@ -1,0 +1,96 @@
+﻿@model IEnumerable<FurnitureShop.Models.Entities.Order>
+
+@{
+    ViewData["Title"] = "Đơn hàng";
+
+    string StatusText(byte s) => s switch
+    {
+        0 => "Chờ xác nhận",
+        1 => "Đã xác nhận",
+        2 => "Đang giao",
+        3 => "Hoàn thành",
+        4 => "Đã huỷ",
+        _ => "Không rõ"
+    };
+
+    string StatusBadge(byte s) => s switch
+    {
+        0 => "bg-warning text-dark",
+        1 => "bg-info text-dark",
+        2 => "bg-primary",
+        3 => "bg-success",
+        4 => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+<h2 class="mb-3">Quản lý đơn hàng</h2>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Trạng thái</label>
+        <select name="status" class="form-select">
+            <option value="">-- Tất cả --</option>
+            <option value="0">Chờ xác nhận</option>
+            <option value="1">Đã xác nhận</option>
+            <option value="2">Đang giao</option>
+            <option value="3">Hoàn thành</option>
+            <option value="4">Đã huỷ</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Từ ngày</label>
+        <input type="date" name="from" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Đến ngày</label>
+        <input type="date" name="to" class="form-control" />
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end gap-2">
+        <button class="btn btn-primary w-100">Lọc</button>
+        <a href="/Admin/Orders" class="btn btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
+<table class="table table-bordered table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Mã</th>
+            <th>Khách hàng</th>
+            <th>Ngày</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th class="text-end">Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in Model)
+        {
+            <tr>
+                <td>@o.OrderCode</td>
+                <td>@o.CustomerName</td>
+                <td>@o.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@o.Total.ToString("n0")</td>
+                <td>
+                    <span class="badge rounded-pill px-3 py-2 @StatusBadge(o.Status)">
+                        @StatusText(o.Status)
+                    </span>
+                </td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-primary"
+                       href="/Admin/Orders/Details/@o.Id">
+                        Chi tiết
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">Không có đơn hàng.</div>
+}

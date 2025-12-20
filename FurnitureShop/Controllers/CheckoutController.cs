@@ -4,6 +4,7 @@ using FurnitureShop.Services.Cart;
 using FurnitureShop.ViewModels.Orders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FurnitureShop.Services.Notifications;
 
 namespace FurnitureShop.Controllers;
 
@@ -11,11 +12,13 @@ public sealed class CheckoutController : Controller
 {
     private readonly FurnitureShopContext _db;
     private readonly ICartService _cart;
+    private readonly NotificationService _noti;
 
-    public CheckoutController(FurnitureShopContext db, ICartService cart)
+    public CheckoutController(FurnitureShopContext db, ICartService cart, NotificationService noti)
     {
         _db = db;
         _cart = cart;
+        _noti = noti;
     }
 
     private string? UserId => User.GetUserId();
@@ -137,6 +140,13 @@ public sealed class CheckoutController : Controller
         await _cart.ClearCartAsync(cart.CartId);
 
         await tx.CommitAsync();
+
+        await _noti.NotifyAdminsAsync(
+            type: "new_order",
+            title: "Có đơn hàng mới",
+            message: $"Đơn {order.OrderCode} - {order.CustomerName} ({order.Total:n0})",
+            url: $"/Admin/Orders/Details/{order.Id}"
+        );
 
         // 2) màn hình thông báo đã đặt hàng
         return RedirectToAction(nameof(Success), new { id = order.Id });

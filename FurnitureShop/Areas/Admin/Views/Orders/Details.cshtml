@@ -1,0 +1,147 @@
+﻿@model FurnitureShop.Models.Entities.Order
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+
+    var histories = ViewBag.Histories as List<FurnitureShop.Models.Entities.OrderStatusHistory>
+                    ?? new();
+
+    string StatusText(byte s) => s switch
+    {
+        0 => "Chờ xác nhận",
+        1 => "Đã xác nhận",
+        2 => "Đang giao",
+        3 => "Hoàn thành",
+        4 => "Đã huỷ",
+        _ => "Không rõ"
+    };
+
+    string StatusBadge(byte s) => s switch
+    {
+        0 => "bg-warning text-dark",
+        1 => "bg-info text-dark",
+        2 => "bg-primary",
+        3 => "bg-success",
+        4 => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+<h2 class="mb-3">Đơn hàng @Model.OrderCode</h2>
+
+<div class="row g-4">
+    <!-- Thông tin đơn -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header fw-semibold">Thông tin khách hàng</div>
+            <div class="card-body">
+                <p><b>Tên:</b> @Model.CustomerName</p>
+                <p><b>Email:</b> @Model.Email</p>
+                <p><b>Điện thoại:</b> @Model.Phone</p>
+                <p><b>Địa chỉ:</b> @Model.Address</p>
+                <p><b>Ngày đặt:</b> @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                <p>
+                    <b>Trạng thái:</b>
+                    <span class="badge rounded-pill px-3 py-2 @StatusBadge(Model.Status)">
+                        @StatusText(Model.Status)
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cập nhật trạng thái -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header fw-semibold">Cập nhật trạng thái</div>
+            <div class="card-body">
+                <form method="post" action="/Admin/Orders/UpdateStatus">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái mới</label>
+                        <select name="toStatus" class="form-select">
+                            <option value="1">Đã xác nhận</option>
+                            <option value="2">Đang giao</option>
+                            <option value="3">Hoàn thành</option>
+                            <option value="4">Huỷ</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea name="note" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary">Cập nhật</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sản phẩm -->
+<div class="card mt-4">
+    <div class="card-header fw-semibold">Sản phẩm trong đơn</div>
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th class="text-end">Giá</th>
+                <th class="text-end">SL</th>
+                <th class="text-end">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model.OrderItems)
+            {
+                <tr>
+                    <td>@i.ProductName</td>
+                    <td class="text-end">@i.UnitPrice.ToString("n0")</td>
+                    <td class="text-end">@i.Quantity</td>
+                    <!-- ✅ LineTotal đã là tổng dòng, không nhân lại Quantity -->
+                    <td class="text-end">@i.LineTotal.ToString("n0")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" class="text-end">Tổng cộng</th>
+                <th class="text-end">@Model.Total.ToString("n0")</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Lịch sử trạng thái -->
+<div class="card mt-4">
+    <div class="card-header fw-semibold">Lịch sử trạng thái</div>
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>Thời gian</th>
+                <th>Thay đổi</th>
+                <th>Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var h in histories)
+            {
+                <tr>
+                    <td>@h.ChangedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <span class="badge @StatusBadge(h.FromStatus)">@StatusText(h.FromStatus)</span>
+                        →
+                        <span class="badge @StatusBadge(h.ToStatus)">@StatusText(h.ToStatus)</span>
+                    </td>
+                    <td>@h.Note</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-4">
+    <a href="/Admin/Orders" class="btn btn-outline-secondary">← Quay lại</a>
+</div>
