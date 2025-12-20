@@ -1,11 +1,12 @@
 using FurnitureShop.Hubs;
 using FurnitureShop.Models;
-using FurnitureShop.Services.Seed;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 using FurnitureShop.Services.Auth;
 using FurnitureShop.Services.Cart;
+using FurnitureShop.Services.Notifications;
+using FurnitureShop.Services.Seed;
 using FurnitureShop.Services.Upload;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +60,9 @@ builder.Services.AddScoped<ICartService, CartService>();
 //Cloudinary service
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+//Notification service
+builder.Services.AddScoped<NotificationService>();
 
 var app = builder.Build();
 
