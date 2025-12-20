@@ -1,0 +1,207 @@
+﻿@model FurnitureShop.ViewModels.Admin.Dashboard.DashboardVm
+@using FurnitureShop.Helpers
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Dashboard</h2>
+        <div class="text-muted">
+            Range: <b>@Model.From:yyyy-MM-dd</b> → <b>@Model.To:yyyy-MM-dd</b>
+        </div>
+    </div>
+
+    <form class="d-flex gap-2" method="get" action="/Admin/Dashboard">
+        <input class="form-control form-control-sm" type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" />
+        <input class="form-control form-control-sm" type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" />
+        <button class="btn btn-primary btn-sm" type="submit">Lọc</button>
+        <a class="btn btn-outline-secondary btn-sm" href="/Admin/Dashboard">Reset</a>
+    </form>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted">Doanh thu (range)</div>
+                <div class="fs-4 fw-bold">@Model.TotalRevenueInRange.ToVnd()</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted">Số đơn (range)</div>
+                <div class="fs-4 fw-bold">@Model.TotalOrdersInRange</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted">Trung bình / đơn</div>
+                <div class="fs-4 fw-bold">
+                    @{
+                        var avg = Model.TotalOrdersInRange <= 0 ? 0m : (Model.TotalRevenueInRange / Model.TotalOrdersInRange);
+                    }
+                    @avg.ToVnd()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted">Top sản phẩm</div>
+                <div class="fs-4 fw-bold">@Model.TopProducts.Count</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Column chart: revenue by day -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header fw-bold">Doanh thu theo ngày (Column)</div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie chart: orders by status -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header fw-bold">Tỷ lệ đơn theo trạng thái (Pie)</div>
+            <div class="card-body">
+                <canvas id="statusChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar chart: top products -->
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header fw-bold">Top sản phẩm bán chạy (Quantity)</div>
+            <div class="card-body">
+                <canvas id="topProductsChart" height="110"></canvas>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-end">SL</th>
+                                <th class="text-end">Doanh thu</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Model.TopProducts)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@p.Name</div>
+                                        <div class="text-muted small">@p.Slug</div>
+                                    </td>
+                                    <td class="text-end">@p.TotalQty</td>
+                                    <td class="text-end">@p.TotalAmount.ToVnd()</td>
+                                    <td class="text-end">
+                                        @if (!string.IsNullOrWhiteSpace(p.Slug))
+                                        {
+                                            <a class="btn btn-outline-secondary btn-sm" href="/products/@p.Slug" target="_blank">Xem</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js (không phụ thuộc jQuery) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        // Data from server
+        const revenueLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueLabels));
+        const revenueValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueValues));
+
+        const statusLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusLabels));
+        const statusCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StatusCounts));
+
+        const topLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopProductLabels));
+        const topQty = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopProductQty));
+
+        // Column chart: Revenue
+        new Chart(document.getElementById("revenueChart"), {
+            type: "bar",
+            data: {
+                labels: revenueLabels,
+                datasets: [{
+                    label: "Doanh thu",
+                    data: revenueValues
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Pie chart: Orders by status
+        new Chart(document.getElementById("statusChart"), {
+            type: "pie",
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusCounts
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: "bottom" }
+                }
+            }
+        });
+
+        // Bar chart: Top products by qty
+        new Chart(document.getElementById("topProductsChart"), {
+            type: "bar",
+            data: {
+                labels: topLabels,
+                datasets: [{
+                    label: "Số lượng bán",
+                    data: topQty
+                }]
+            },
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    x: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+}

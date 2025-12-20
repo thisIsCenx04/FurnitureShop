@@ -5,8 +5,24 @@ namespace FurnitureShop.Helpers;
 public static class ClaimsExtensions
 {
     public static string? GetUserId(this ClaimsPrincipal user)
-        => user.FindFirst("uid")?.Value;
+        => user.FindFirstValue("uid");
+
+    public static string? GetUserIdOrNull(this ClaimsPrincipal user)
+    {
+        return user?.Identity?.IsAuthenticated == true
+            ? user.FindFirstValue(ClaimTypes.NameIdentifier)
+            : null;
+    }
+
+    public static string? GetUserName(this ClaimsPrincipal user)
+    {
+        return user?.Identity?.IsAuthenticated == true
+            ? user.Identity!.Name
+            : null;
+    }
 
     public static bool IsAdmin(this ClaimsPrincipal user)
-        => string.Equals(user.FindFirst(ClaimTypes.Role)?.Value, "Admin", StringComparison.OrdinalIgnoreCase);
+    {
+        return user.IsInRole("Admin");
+    }
 }

@@ -1,0 +1,36 @@
+﻿@model FurnitureShop.ViewComponents.CategoryMenuViewComponent.Node
+@{
+    var level = (int)(ViewData["Level"] ?? 0);
+    var padding = 10 + level * 16;
+    var hasChildren = Model.Children != null && Model.Children.Count > 0;
+}
+
+<li class="cat-item">
+    <div class="d-flex align-items-center cat-row" style="padding-left:@(padding)px; cursor:pointer;">
+        @if (hasChildren)
+        {
+            <button type="button" class="cat-toggle btn btn-sm btn-light me-2">▸</button>
+        }
+        else
+        {
+            <span class="me-2" style="width:28px; display:inline-block;"></span>
+        }
+
+        <a class="cat-link text-decoration-none" href="/products?category=@Model.Slug">
+            @Model.Name
+        </a>
+    </div>
+
+    @if (hasChildren)
+    {
+        <ul class="list-unstyled ms-0 cat-children" style="display:none;">
+            @foreach (var child in Model.Children)
+            {
+                @await Html.PartialAsync("_CategoryTreeNode", child, new ViewDataDictionary(ViewData)
+                {
+                ["Level"] = level + 1
+                })
+                }
+        </ul>
+    }
+</li>

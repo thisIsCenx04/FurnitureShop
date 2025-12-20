@@ -1,0 +1,71 @@
+﻿@model FurnitureShop.ViewModels.Orders.CheckoutVm
+
+<h2>Checkout (COD)</h2>
+
+<div class="row">
+    <div class="col-md-7">
+        <form method="post" action="/checkout">
+            @Html.AntiForgeryToken()
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary()
+                </div>
+            }
+
+            <div class="mb-3">
+                <label class="form-label">Họ tên</label>
+                <input class="form-control" asp-for="CustomerName" />
+                <span class="text-danger" asp-validation-for="CustomerName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">SĐT</label>
+                <input class="form-control" asp-for="Phone" />
+                <span class="text-danger" asp-validation-for="Phone"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email (tuỳ chọn)</label>
+                <input class="form-control" asp-for="Email" />
+                <span class="text-danger" asp-validation-for="Email"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Địa chỉ</label>
+                <input class="form-control" asp-for="Address" />
+                <span class="text-danger" asp-validation-for="Address"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ghi chú</label>
+                <textarea class="form-control" asp-for="Note"></textarea>
+            </div>
+
+            <button class="btn btn-success">Đặt hàng (COD)</button>
+        </form>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body">
+                <h5>Đơn hàng</h5>
+                <ul class="list-unstyled">
+                    @foreach (var it in Model.Cart.Items)
+                    {
+                        <li class="d-flex justify-content-between">
+                            <span>@it.ProductName x @it.Quantity</span>
+                            <span>@it.LineTotal.ToString("n0") đ</span>
+                        </li>
+                    }
+                </ul>
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <strong>Tạm tính</strong>
+                    <strong>@Model.Cart.Subtotal.ToString("n0") đ</strong>
+                </div>
+                <div class="text-muted mt-2">Thanh toán khi nhận hàng (COD)</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,80 @@
+﻿@model FurnitureShop.ViewModels.Orders.OrderDetailVm
+
+<h2>Chi tiết đơn hàng</h2>
+
+<div class="mb-3">
+    <a href="/orders" class="btn btn-outline-secondary">
+        ← Quay lại đơn hàng
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div><strong>Mã đơn:</strong> @Model.OrderCode</div>
+        <div><strong>Ngày tạo:</strong> @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+        <div>
+            <strong>Trạng thái:</strong>
+            <span class="badge @OrderStatusHelper.ToBadgeClass(Model.Status)">
+                @OrderStatusHelper.ToText(Model.Status)
+            </span>
+        </div>
+
+        <div><strong>Thanh toán:</strong> @(Model.PaymentMethod == 0 ? "COD" : Model.PaymentMethod.ToString())</div>
+        <div><strong>Giao tới:</strong> @Model.Address</div>
+    </div>
+</div>
+
+<h4>Sản phẩm</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>SL</th>
+            <th>Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var it in Model.Items)
+        {
+            <tr>
+                <td>@it.ProductName</td>
+                <td>@it.UnitPrice.ToString("n0") đ</td>
+                <td>@it.Quantity</td>
+                <td>@it.LineTotal.ToString("n0") đ</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-end">
+    <div style="min-width:320px;">
+        <div class="d-flex justify-content-between"><span>Tạm tính</span><strong>@Model.Subtotal.ToString("n0") đ</strong></div>
+        <div class="d-flex justify-content-between"><span>Ship</span><strong>@Model.ShippingFee.ToString("n0") đ</strong></div>
+        <div class="d-flex justify-content-between"><span>Giảm giá</span><strong>@Model.DiscountAmount.ToString("n0") đ</strong></div>
+        <hr />
+        <div class="d-flex justify-content-between"><span>Tổng</span><strong>@Model.Total.ToString("n0") đ</strong></div>
+    </div>
+</div>
+
+<h4 class="mt-4">Lịch sử trạng thái</h4>
+<ul class="list-group">
+    @foreach (var h in Model.Timeline)
+    {
+        <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="badge @OrderStatusHelper.ToBadgeClass(h.ToStatus)">
+                    @OrderStatusHelper.ToText(h.ToStatus)
+                </span>
+                <small class="text-muted">
+                    @h.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                </small>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(h.Note))
+            {
+                <div class="text-muted mt-1">@h.Note</div>
+            }
+        </li>
+    }
+</ul>

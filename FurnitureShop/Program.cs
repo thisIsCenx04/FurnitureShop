@@ -1,9 +1,12 @@
 using FurnitureShop.Hubs;
 using FurnitureShop.Models;
+using FurnitureShop.Services.Auth;
+using FurnitureShop.Services.Cart;
+using FurnitureShop.Services.Notifications;
 using FurnitureShop.Services.Seed;
+using FurnitureShop.Services.Upload;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using FurnitureShop.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +18,6 @@ builder.Services.AddDbContext<FurnitureShopContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("FurnitureShop"));
 });
-
-
 
 // Session
 builder.Services.AddDistributedMemoryCache();
@@ -53,6 +54,16 @@ builder.Services.AddScoped<IDbSeeder, DbSeeder>();
 // Auth service
 builder.Services.AddScoped<IUserService, UserService>();
 
+//Cart service
+builder.Services.AddScoped<ICartService, CartService>();
+
+//Cloudinary service
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+//Notification service
+builder.Services.AddScoped<NotificationService>();
+
 var app = builder.Build();
 
 // Error pipeline
@@ -79,9 +90,18 @@ app.UseAuthorization();
 app.MapHub<NotificationHub>("/hubs/notifications");
 
 // Route Area 
+// ADMIN route (lock with AdminOnly)
+app.MapControllerRoute(
+    name: "admin",
+    pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}",
+    defaults: new { area = "Admin" }
+).RequireAuthorization("AdminOnly");
+
+// Generic areas route 
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+
 
 // Default route
 app.MapControllerRoute(

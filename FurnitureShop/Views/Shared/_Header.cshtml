@@ -1,4 +1,6 @@
-﻿<header class="border-bottom">
+﻿@using FurnitureShop.Helpers
+
+<header class="border-bottom">
     <nav class="navbar navbar-expand-lg bg-white">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/">FurnitureShop</a>
@@ -9,16 +11,57 @@
 
             <div class="collapse navbar-collapse" id="topnav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                Quản trị
+                            </a>
+                        </li>
+                    }
                     <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Sản phẩm</a>
+                    </li>
 
-                    <!-- Menu danh mục (đọc từ DB) -->
-                    @await Component.InvokeAsync("CategoryMenu")
+                  @*   <!-- Menu danh mục (đọc từ DB) -->
+                    @await Component.InvokeAsync("CategoryMenu") *@
                 </ul>
 
-                <div class="d-flex gap-2">
-                    <a class="btn btn-outline-secondary btn-sm" href="/cart">Giỏ hàng</a>
-                    <a class="btn btn-outline-primary btn-sm" href="/account/login">Đăng nhập</a>
+                <div class="d-flex gap-2 align-items-center">
+
+                    <!-- Cart luôn hiển thị -->
+                    <a class="btn btn-outline-secondary btn-sm" href="/cart">
+                        Giỏ hàng
+                    </a>
+
+                    @if (User?.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                @User.Identity!.Name
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/account/profile">Tài khoản</a></li>
+                                <li><a class="dropdown-item" href="/orders">Lịch sử đặt hàng</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="/account/logout" class="px-3 py-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-danger btn-sm w-100" type="submit">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary btn-sm" href="/account/login">Đăng nhập</a>
+                    }
                 </div>
             </div>
         </div>

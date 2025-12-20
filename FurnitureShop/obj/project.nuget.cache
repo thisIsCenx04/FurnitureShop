@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Tx3oJ238fzw=",
+  "dgSpecHash": "NQpdC2GP5TY=",
   "success": true,
-  "projectFilePath": "D:\\Work\\FurnitureShop\\FurnitureShop.csproj",
+  "projectFilePath": "D:\\Work\\FurnitureShop\\FurnitureShop\\FurnitureShop.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\spiri\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\spiri\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

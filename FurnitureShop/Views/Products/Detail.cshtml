@@ -1,0 +1,75 @@
+﻿@model FurnitureShop.ViewModels.Products.ProductDetailVm
+@using FurnitureShop.Helpers
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<a class="text-decoration-none" href="/products">← Quay lại</a>
+
+<div class="row mt-3">
+    <div class="col-lg-7">
+        <div class="border rounded p-2">
+            <img class="img-fluid w-100"
+                 style="max-height:520px;object-fit:cover"
+                 src="@(Model.MainImageUrl ?? "https://via.placeholder.com/900x520?text=No+Image")"
+                 alt="@Model.Name" />
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="text-muted small">@Model.CategoryName</div>
+        <h1 class="fw-bold">@Model.Name</h1>
+
+        <div class="mb-2">
+            @if (Model.SalePrice.HasValue && Model.SalePrice.Value < Model.Price)
+            {
+                <div class="text-muted text-decoration-line-through">@Model.Price.ToVnd()</div>
+                <div class="fs-3 fw-bold">@Model.SalePrice.Value.ToVnd()</div>
+            }
+            else
+            {
+                <div class="fs-3 fw-bold">@Model.Price.ToVnd()</div>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+        {
+            <div class="text-muted mb-3">@Model.ShortDescription</div>
+        }
+
+        <div class="border rounded p-3 mb-3">
+            <div><b>Chất liệu:</b> @(Model.Material ?? "-")</div>
+            <div><b>Kích thước:</b> @(Model.Dimensions ?? "-")</div>
+            <div><b>Phong cách:</b> @(Model.Style ?? "-")</div>
+            <div><b>Tồn kho:</b> @Model.Stock</div>
+        </div>
+
+        <form method="post" action="/cart/add" class="d-flex gap-2 align-items-center">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="productId" value="@Model.Id" />
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+
+            <input type="number"
+                   name="qty"
+                   class="form-control"
+                   style="max-width:120px"
+                   value="1"
+                   min="1"
+                   max="@(Model.Stock <= 0 ? 1 : Model.Stock)"
+                   @(Model.Stock <= 0 ? "disabled" : "") />
+
+            <button class="btn btn-primary"
+                    type="submit"
+                    @(Model.Stock <= 0 ? "disabled" : "")>
+                Thêm vào giỏ
+            </button>
+        </form>
+
+        @if (Model.Stock <= 0)
+        {
+            <div class="text-danger small mt-2">Sản phẩm hiện hết hàng.</div>
+        }
+    </div>
+</div>

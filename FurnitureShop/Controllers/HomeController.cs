@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using FurnitureShop.Models;
 using FurnitureShop.ViewModels;
+using FurnitureShop.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

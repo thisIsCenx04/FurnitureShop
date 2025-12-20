@@ -1,0 +1,17 @@
+﻿@model FurnitureShop.Models.Entities.Category
+@{
+    ViewData["Title"] = "Xoá danh mục";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="mb-3">Xoá danh mục</h3>
+
+<div class="alert alert-warning">
+    Bạn chắc chắn muốn xoá danh mục: <b>@Model.Name</b> ?
+</div>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-danger" type="submit">Xoá</button>
+    <a class="btn btn-secondary" asp-area="Admin" asp-controller="Categories" asp-action="Index">Hủy</a>
+</form>

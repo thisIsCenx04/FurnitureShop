@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Auth\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
