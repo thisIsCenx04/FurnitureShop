@@ -1,12 +1,4 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-console.log("site.js loaded");
-// Toggle category tree inside bootstrap dropdown
-// ===== Category tree toggle (works inside Bootstrap dropdown/navbar collapse) =====
-// Prevent dropdown from closing when clicking inside
-console.log("site.js loaded");
+﻿console.log("site.js loaded");
 
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(el => {
@@ -42,6 +34,11 @@ document.addEventListener("click", function (e) {
     children.style.display = isOpen ? "block" : "none";
 }, true);
 
+function getAntiForgeryToken() {
+    const el = document.querySelector('#af-token input[name="__RequestVerificationToken"]');
+    return el ? el.value : "";
+}
+
 document.addEventListener("click", function (e) {
     const btn = e.target.closest(".qty-btn");
     if (!btn) return;
@@ -51,15 +48,16 @@ document.addEventListener("click", function (e) {
 
     const input = btn.parentElement.querySelector("input");
     let qty = parseInt(input.value, 10) + delta;
-
     if (qty < 1) qty = 1;
+
+    const token = getAntiForgeryToken();
 
     fetch("/cart/update", {
         method: "POST",
         headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
+            "Content-Type": "application/x-www-form-urlencoded",
+            "RequestVerificationToken": token
         },
-        body: `cartItemId=${cartItemId}&qty=${qty}`
-    })
-        .then(() => location.reload());
+        body: `cartItemId=${encodeURIComponent(cartItemId)}&qty=${encodeURIComponent(qty)}`
+    }).then(() => location.reload());
 });

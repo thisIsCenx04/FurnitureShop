@@ -11,21 +11,77 @@ public sealed class CartService : ICartService
 
     public async Task<CartSummaryVm> GetOrCreateCartAsync(string? userId, string cartKey)
     {
-        var cart = await _db.Carts
-            .FirstOrDefaultAsync(c =>
-                (!string.IsNullOrEmpty(userId) && c.UserId == userId) ||
-                (string.IsNullOrEmpty(userId) && c.CartKey == cartKey));
-
-        if (cart == null)
+        global::FurnitureShop.Models.Entities.Cart? userCart = null;
+        if (!string.IsNullOrWhiteSpace(userId))
         {
-            cart = new Models.Entities.Cart
+            userCart = await _db.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
+        }
+
+        var keyCart = await _db.Carts.FirstOrDefaultAsync(c => c.CartKey == cartKey);
+
+        global::FurnitureShop.Models.Entities.Cart cart;
+
+        if (userCart == null && keyCart != null)
+        {
+            if (!string.IsNullOrWhiteSpace(userId) && string.IsNullOrWhiteSpace(keyCart.UserId))
             {
-                UserId = userId,
+                keyCart.UserId = userId;
+                await _db.SaveChangesAsync();
+            }
+
+            cart = keyCart;
+        }
+        else if (userCart != null && keyCart != null && userCart.Id != keyCart.Id)
+        {
+            var userItems = await _db.CartItems.Where(x => x.CartId == userCart.Id).ToListAsync();
+            var guestItems = await _db.CartItems.Where(x => x.CartId == keyCart.Id).ToListAsync();
+
+            foreach (var gi in guestItems)
+            {
+                var exist = userItems.FirstOrDefault(x => x.ProductId == gi.ProductId);
+                if (exist == null)
+                {
+                    gi.CartId = userCart.Id;
+                }
+                else
+                {
+                    exist.Quantity += gi.Quantity;
+                    _db.CartItems.Remove(gi);
+                }
+            }
+
+            _db.Carts.Remove(keyCart);
+
+            await _db.SaveChangesAsync();
+            cart = userCart;
+        }
+        else if (userCart != null)
+        {
+            cart = userCart;
+        }
+        else if (keyCart == null)
+        {
+            cart = new global::FurnitureShop.Models.Entities.Cart
+            {
                 CartKey = cartKey,
+                UserId = userId,
                 CreatedAt = DateTime.UtcNow
             };
+
             _db.Carts.Add(cart);
-            await _db.SaveChangesAsync();
+
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                cart = await _db.Carts.FirstAsync(c => c.CartKey == cartKey);
+            }
+        }
+        else
+        {
+            cart = keyCart;
         }
 
         var items = await (
@@ -35,6 +91,7 @@ public sealed class CartService : ICartService
             select new CartItemVm
             {
                 CartItemId = ci.Id,
+                CartId = ci.CartId,
                 ProductId = p.Id,
                 ProductName = p.Name,
                 ProductSlug = p.Slug,
@@ -45,10 +102,9 @@ public sealed class CartService : ICartService
             }
         ).ToListAsync();
 
-
         return new CartSummaryVm
         {
-            CartId = cart.Id,                    
+            CartId = cart.Id,
             CartKey = cart.CartKey,
             Items = items
         };
@@ -60,8 +116,8 @@ public sealed class CartService : ICartService
 
         var p = await _db.Products.FirstOrDefaultAsync(x => x.Id == productId && x.IsActive);
         if (p == null) throw new InvalidOperationException("Product not found.");
-
         if (p.Stock <= 0) throw new InvalidOperationException("Sản phẩm đã hết hàng.");
+
         if (qty > p.Stock) qty = p.Stock;
 
         var cartVm = await GetOrCreateCartAsync(userId, cartKey);
@@ -71,7 +127,7 @@ public sealed class CartService : ICartService
 
         if (item == null)
         {
-            _db.CartItems.Add(new Models.Entities.CartItem
+            _db.CartItems.Add(new global::FurnitureShop.Models.Entities.CartItem
             {
                 CartId = cartId,
                 ProductId = productId,
@@ -88,7 +144,6 @@ public sealed class CartService : ICartService
         await _db.SaveChangesAsync();
     }
 
-
     public async Task UpdateQtyAsync(string? userId, string cartKey, long cartItemId, int qty)
     {
         if (qty <= 0) qty = 1;
@@ -101,7 +156,12 @@ public sealed class CartService : ICartService
         var p = await _db.Products.AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == item.ProductId && x.IsActive);
 
-        if (p == null) { _db.CartItems.Remove(item); await _db.SaveChangesAsync(); return; }
+        if (p == null)
+        {
+            _db.CartItems.Remove(item);
+            await _db.SaveChangesAsync();
+            return;
+        }
 
         if (p.Stock <= 0)
         {
@@ -115,7 +175,6 @@ public sealed class CartService : ICartService
         item.Quantity = qty;
         await _db.SaveChangesAsync();
     }
-
 
     public async Task RemoveItemAsync(string? userId, string cartKey, long cartItemId)
     {

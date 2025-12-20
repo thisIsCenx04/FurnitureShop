@@ -25,7 +25,6 @@ public sealed class UserService : IUserService
         user.UserName = user.UserName.Trim();
         user.Email = user.Email.Trim();
 
-        // Check duplicate (DB có unique thì càng tốt, nhưng vẫn check trước để báo lỗi đẹp)
         var existsUserName = await _db.Users.AnyAsync(u => u.UserName == user.UserName);
         if (existsUserName) return (false, "UserName đã tồn tại.");
 

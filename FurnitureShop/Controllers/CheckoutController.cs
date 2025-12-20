@@ -1,10 +1,10 @@
 ﻿using FurnitureShop.Helpers;
 using FurnitureShop.Models;
 using FurnitureShop.Services.Cart;
+using FurnitureShop.Services.Notifications;
 using FurnitureShop.ViewModels.Orders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FurnitureShop.Services.Notifications;
 
 namespace FurnitureShop.Controllers;
 
@@ -23,13 +23,45 @@ public sealed class CheckoutController : Controller
 
     private string? UserId => User.GetUserId();
 
+    private async Task<(string? Name, string? Phone, string? Email, string? Address)> LoadProfileAsync()
+    {
+        if (string.IsNullOrWhiteSpace(UserId)) return (null, null, null, null);
+
+        var u = await _db.Users
+            .AsNoTracking()
+            .Where(x => x.Id == UserId)
+            .Select(x => new
+            {
+                Name = x.FullName,
+                Phone = x.Phone,
+                Email = x.Email,
+                Address = x.Address
+            })
+            .FirstOrDefaultAsync();
+
+        if (u == null) return (null, null, null, null);
+        return (u.Name, u.Phone, u.Email, u.Address);
+    }
+
     [HttpGet("/checkout")]
     public async Task<IActionResult> Index()
     {
         var cartKey = CartKeyHelper.GetOrCreateCartKey(HttpContext);
         var cart = await _cart.GetOrCreateCartAsync(UserId, cartKey);
         if (cart.Items.Count == 0) return Redirect("/cart");
-        return View(new CheckoutVm { Cart = cart });
+
+        var (name, phone, email, address) = await LoadProfileAsync();
+
+        var vm = new CheckoutVm
+        {
+            Cart = cart,
+            CustomerName = name ?? "",
+            Phone = phone ?? "",
+            Email = email ?? "",
+            Address = address ?? ""
+        };
+
+        return View(vm);
     }
 
     [HttpPost("/checkout")]
@@ -40,13 +72,22 @@ public sealed class CheckoutController : Controller
         var cart = await _cart.GetOrCreateCartAsync(UserId, cartKey);
 
         if (cart.Items.Count == 0) ModelState.AddModelError("", "Giỏ hàng trống.");
+
+        if (string.IsNullOrWhiteSpace(input.CustomerName))
+            ModelState.AddModelError(nameof(input.CustomerName), "Vui lòng nhập họ tên.");
+
+        if (string.IsNullOrWhiteSpace(input.Phone))
+            ModelState.AddModelError(nameof(input.Phone), "Vui lòng nhập số điện thoại.");
+
+        if (string.IsNullOrWhiteSpace(input.Address))
+            ModelState.AddModelError(nameof(input.Address), "Vui lòng nhập địa chỉ.");
+
         if (!ModelState.IsValid)
         {
             input.Cart = cart;
             return View("Index", input);
         }
 
-        // Load Products WITH TRACKING để update Stock
         var productIds = cart.Items.Select(x => x.ProductId).Distinct().ToList();
 
         using var tx = await _db.Database.BeginTransactionAsync();
@@ -55,7 +96,6 @@ public sealed class CheckoutController : Controller
             .Where(p => productIds.Contains(p.Id) && p.IsActive)
             .ToDictionaryAsync(p => p.Id);
 
-        // 1) CHECK TỒN KHO: cart qty <= stock
         foreach (var ci in cart.Items)
         {
             if (!products.TryGetValue(ci.ProductId, out var p))
@@ -80,7 +120,7 @@ public sealed class CheckoutController : Controller
         decimal shipping = 0m;
         decimal discount = 0m;
 
-        var order = new Models.Entities.Order
+        var order = new FurnitureShop.Models.Entities.Order
         {
             OrderCode = "OD" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"),
             UserId = UserId,
@@ -91,7 +131,7 @@ public sealed class CheckoutController : Controller
             Address = input.Address.Trim(),
             Note = input.Note?.Trim(),
 
-            PaymentMethod = 0, // COD
+            PaymentMethod = 0,
             Status = 0,
 
             Subtotal = 0m,
@@ -105,7 +145,6 @@ public sealed class CheckoutController : Controller
         _db.Orders.Add(order);
         await _db.SaveChangesAsync();
 
-        // 3) TRỪ TỒN KHO + tạo OrderItems snapshot
         foreach (var ci in cart.Items)
         {
             var p = products[ci.ProductId];
@@ -115,7 +154,7 @@ public sealed class CheckoutController : Controller
 
             subtotal += line;
 
-            _db.OrderItems.Add(new Models.Entities.OrderItem
+            _db.OrderItems.Add(new FurnitureShop.Models.Entities.OrderItem
             {
                 OrderId = order.Id,
                 ProductId = p.Id,
@@ -126,9 +165,8 @@ public sealed class CheckoutController : Controller
                 CreatedAt = DateTime.UtcNow
             });
 
-            // trừ tồn kho
             p.Stock -= ci.Quantity;
-            if (p.Stock < 0) p.Stock = 0; // safety
+            if (p.Stock < 0) p.Stock = 0;
         }
 
         order.Subtotal = subtotal;
@@ -136,7 +174,6 @@ public sealed class CheckoutController : Controller
 
         await _db.SaveChangesAsync();
 
-        // clear cart
         await _cart.ClearCartAsync(cart.CartId);
 
         await tx.CommitAsync();
@@ -148,11 +185,9 @@ public sealed class CheckoutController : Controller
             url: $"/Admin/Orders/Details/{order.Id}"
         );
 
-        // 2) màn hình thông báo đã đặt hàng
         return RedirectToAction(nameof(Success), new { id = order.Id });
     }
 
-    // 2) Success screen
     [HttpGet("/checkout/success/{id:long}")]
     public async Task<IActionResult> Success(long id)
     {
