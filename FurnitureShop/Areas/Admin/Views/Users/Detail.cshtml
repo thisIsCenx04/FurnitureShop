@@ -1,0 +1,56 @@
+﻿@model FurnitureShop.Models.Entities.User
+@using FurnitureShop.Models.Enums
+
+@{
+    ViewData["Title"] = "User detail";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="mb-0">Chi tiết user</h2>
+    <a class="btn btn-outline-secondary" href="/Admin/Users">← Quay lại</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Id</dt>
+            <dd class="col-sm-9">@Model.Id</dd>
+
+            <dt class="col-sm-3">UserName</dt>
+            <dd class="col-sm-9">@Model.UserName</dd>
+
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">FullName</dt>
+            <dd class="col-sm-9">@Model.FullName</dd>
+
+            <dt class="col-sm-3">Phone</dt>
+            <dd class="col-sm-9">@Model.Phone</dd>
+
+            <dt class="col-sm-3">Address</dt>
+            <dd class="col-sm-9">@Model.Address</dd>
+
+            <dt class="col-sm-3">Role</dt>
+            <dd class="col-sm-9">
+                <span class="badge @(Model.Role == (byte)UserRole.Admin ? "bg-danger" : "bg-secondary")">
+                    @(Model.Role == (byte)UserRole.Admin ? "Admin" : "Customer")
+                </span>
+            </dd>
+
+            <dt class="col-sm-3">IsActive</dt>
+            <dd class="col-sm-9">
+                <span class="badge @(Model.IsActive ? "bg-success" : "bg-dark")">
+                    @(Model.IsActive ? "Active" : "Locked")
+                </span>
+            </dd>
+
+            <dt class="col-sm-3">CreatedAt</dt>
+            <dd class="col-sm-9">@Model.CreatedAt</dd>
+
+            <dt class="col-sm-3">UpdatedAt</dt>
+            <dd class="col-sm-9">@Model.UpdatedAt</dd>
+        </dl>
+    </div>
+</div>
