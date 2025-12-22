@@ -66,6 +66,8 @@ builder.Services.AddScoped<NotificationService>();
 
 var app = builder.Build();
 
+app.UsePathBase("/nvv");
+
 // Error pipeline
 if (!app.Environment.IsDevelopment())
 {
