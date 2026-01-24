@@ -1,11 +1,14 @@
 ﻿@using FurnitureShop.Helpers
 
-<header class="border-bottom">
-    <nav class="navbar navbar-expand-lg bg-white">
+<header class="border-bottom sticky-top">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">FurnitureShop</a>
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+                <i class="fas fa-couch" style="color: var(--accent);"></i>
+                <span class="gradient-text">FurnitureShop</span>
+            </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topnav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#topnav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -15,44 +18,65 @@
                     {
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                Quản trị
+                                <i class="fas fa-chart-line me-1"></i> Quản trị
                             </a>
                         </li>
                     }
-                    <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Sản phẩm</a>
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i> Trang chủ
+                        </a>
                     </li>
-
-                  @*   <!-- Menu danh mục (đọc từ DB) -->
-                    @await Component.InvokeAsync("CategoryMenu") *@
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">
+                            <i class="fas fa-shopping-bag me-1"></i> Sản phẩm
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="d-flex gap-2 align-items-center">
-
                     <!-- Cart luôn hiển thị -->
-                    <a class="btn btn-outline-secondary btn-sm" href="/cart">
+                    <a class="btn btn-outline-primary btn-sm position-relative" href="/cart">
+                        <i class="fas fa-shopping-cart me-1"></i>
                         Giỏ hàng
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                              style="font-size: 0.65rem; display: none;" id="cartBadge">
+                            0
+                        </span>
                     </a>
 
                     @if (User?.Identity?.IsAuthenticated == true)
                     {
                         <div class="dropdown">
-                            <button class="btn btn-outline-primary btn-sm dropdown-toggle"
+                            <button class="btn btn-primary btn-sm dropdown-toggle d-flex align-items-center gap-2"
                                     type="button"
                                     data-bs-toggle="dropdown"
                                     aria-expanded="false">
-                                @User.Identity!.Name
+                                <i class="fas fa-user-circle"></i>
+                                <span>@User.Identity!.Name</span>
                             </button>
 
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/account/profile">Tài khoản</a></li>
-                                <li><a class="dropdown-item" href="/orders">Lịch sử đặt hàng</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" style="min-width: 200px;">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="/account/profile">
+                                        <i class="fas fa-user text-primary"></i>
+                                        Tài khoản
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="/orders">
+                                        <i class="fas fa-box text-info"></i>
+                                        Lịch sử đặt hàng
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="post" action="/account/logout" class="px-3 py-1">
                                         @Html.AntiForgeryToken()
-                                        <button class="btn btn-danger btn-sm w-100" type="submit">Đăng xuất</button>
+                                        <button class="btn btn-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2" type="submit">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                            Đăng xuất
+                                        </button>
                                     </form>
                                 </li>
                             </ul>
@@ -60,10 +84,27 @@
                     }
                     else
                     {
-                        <a class="btn btn-outline-primary btn-sm" href="/account/login">Đăng nhập</a>
+                        <a class="btn btn-primary btn-sm d-flex align-items-center gap-2" href="/account/login">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Đăng nhập
+                        </a>
                     }
                 </div>
             </div>
         </div>
     </nav>
 </header>
+
+<script>
+    // Update cart badge (if you have cart count in session/cookie)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Example: update cart badge from localStorage or fetch from API
+        const cartBadge = document.getElementById('cartBadge');
+        // Uncomment and modify based on your cart logic
+        // const cartCount = localStorage.getItem('cartCount') || 0;
+        // if (cartCount > 0) {
+        //     cartBadge.textContent = cartCount;
+        //     cartBadge.style.display = 'inline-block';
+        // }
+    });
+</script>
