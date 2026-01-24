@@ -3,305 +3,302 @@
 
 @{
     ViewData["Title"] = "Sản phẩm";
-    string placeholder = "/images/placeholder.png";
-
-    var selectedCats = (Model.Filter.Categories ?? new List<string>())
-        .Where(x => !string.IsNullOrWhiteSpace(x))
-        .Distinct()
-        .ToList();
+    var placeholder = "/images/placeholder.png";
 }
 
-<h2 class="mb-3">Sản phẩm</h2>
-
-<form method="get" action="/products" class="border rounded p-3 mb-4">
-    <div class="row g-3">
-        <!-- Danh mục (multi) -->
-        <div class="col-12">
-            <label class="form-label">Danh mục</label>
-
-            <!-- Hidden inputs để submit list Categories -->
-            <div id="catHiddenInputs">
-                @foreach (var slug in selectedCats)
-                {
-                    <input type="hidden" name="Categories" value="@slug" />
-                }
-            </div>
-
-            <div class="d-flex flex-column gap-2">
-                <!-- Tags (giới hạn chiều cao để không làm tuột layout) -->
-                <div id="catTags" class="cat-tags-box"></div>
-
-                <!-- Dropdown checklist -->
-                <div class="dropdown">
-                    <button class="form-select text-start"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                        Chọn danh mục
-                    </button>
-
-                    <div class="dropdown-menu w-100 p-2" style="max-height:300px; overflow:auto;">
-                        @foreach (var root in Model.CategoryTree)
-                        {
-                            @await Html.PartialAsync("_CategoryMultiCheckNode", root, new ViewDataDictionary(ViewData)
-                            {
-                            ["Level"] = 0,
-                                                ["SelectedSlugs"] = selectedCats
-                                                })
-                                                }
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-4">
-            <label class="form-label">Từ khoá</label>
-            <input class="form-control" name="q" value="@Model.Filter.Q" placeholder="Tên sản phẩm..." />
-        </div>
-
-        <div class="col-6 col-md-2">
-            <label class="form-label">Giá từ</label>
-            <input class="form-control" name="min" value="@(Model.Filter.Min?.ToString() ?? "")" />
-        </div>
-
-        <div class="col-6 col-md-2">
-            <label class="form-label">Giá đến</label>
-            <input class="form-control" name="max" value="@(Model.Filter.Max?.ToString() ?? "")" />
-        </div>
-
-        <div class="col-12 col-md-3">
-            <label class="form-label">Chất liệu</label>
-            <select class="form-select" name="material">
-                <option value="">-- Tất cả --</option>
-                @foreach (var m in Model.Materials)
-                {
-                    <option value="@m" selected="@(Model.Filter.Material == m)">@m</option>
-                }
-            </select>
-        </div>
-
-        <div class="col-12 col-md-3">
-            <label class="form-label">Phong cách</label>
-            <select class="form-select" name="style">
-                <option value="">-- Tất cả --</option>
-                @foreach (var s in Model.Styles)
-                {
-                    <option value="@s" selected="@(Model.Filter.Style == s)">@s</option>
-                }
-            </select>
-        </div>
-
-        <div class="col-12 col-md-3">
-            <label class="form-label">Sắp xếp</label>
-            <select class="form-select" name="sort">
-                <option value="newest" selected="@(Model.Filter.Sort == "newest")">Mới nhất</option>
-                <option value="price_asc" selected="@(Model.Filter.Sort == "price_asc")">Giá tăng dần</option>
-                <option value="price_desc" selected="@(Model.Filter.Sort == "price_desc")">Giá giảm dần</option>
-                <option value="name_asc" selected="@(Model.Filter.Sort == "name_asc")">Tên A → Z</option>
-            </select>
-        </div>
-
-        <div class="col-12 col-md-3 d-flex align-items-end gap-2">
-            <button class="btn btn-primary w-100" type="submit">Lọc</button>
-            <a class="btn btn-outline-secondary" href="/products">Reset</a>
-        </div>
-    </div>
-</form>
-
-<div class="d-flex justify-content-between align-items-center mb-2">
-    <div class="text-muted small">
-        Tổng: <b>@Model.TotalItems</b> sản phẩm
-    </div>
+<!-- Page Header -->
+<div class="mb-4">
+    <h1 class="display-5 fw-bold mb-2">
+        <i class="fas fa-shopping-bag me-3 text-primary"></i>
+        Sản phẩm
+    </h1>
+    <p class="text-muted mb-0">
+        Tìm thấy <strong class="text-primary">@Model.TotalItems</strong> sản phẩm
+    </p>
 </div>
 
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning">Không có sản phẩm phù hợp.</div>
-}
-else
-{
-    <div class="row g-3">
-        @foreach (var p in Model.Items)
-        {
-            var img = string.IsNullOrWhiteSpace(p.MainImageUrl) ? placeholder : p.MainImageUrl;
+<div class="row g-4">
+    <!-- Sidebar Filters -->
+    <div class="col-lg-3">
+        <div class="card sticky-top" style="top: 100px;">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-filter me-2"></i>
+                    Bộ lọc
+                </h5>
 
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="card h-100">
-                    <a href="/products/@p.Slug">
-                        <img class="card-img-top"
-                             src="@img"
-                             alt="@p.Name"
-                             style="aspect-ratio: 4/3; object-fit: cover;" />
-                    </a>
-                    <div class="card-body">
-                        <div class="small text-muted">@p.CategoryName</div>
-                        <a class="text-decoration-none fw-semibold d-block" href="/products/@p.Slug">@p.Name</a>
+                <form method="get" id="filterForm">
+                    <!-- Search -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-search me-1"></i>
+                            Tìm kiếm
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               name="q" 
+                               value="@Model.Filter.Q" 
+                               placeholder="Tên sản phẩm..." />
+                    </div>
 
-                        <div class="mt-2">
-                            @if (p.SalePrice.HasValue)
+                    <!-- Categories -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-folder me-1"></i>
+                            Danh mục
+                        </label>
+                        <div class="cat-tree" style="max-height: 300px; overflow-y: auto;">
+                            @foreach (var root in Model.CategoryTree)
                             {
-                                <div class="text-decoration-line-through text-muted small">@p.Price.ToVnd()</div>
-                                <div class="fw-bold">@p.SalePrice.Value.ToVnd()</div>
-                            }
-                            else
-                            {
-                                <div class="fw-bold">@p.Price.ToVnd()</div>
+                                @await Html.PartialAsync("_CategoryMultiCheckNode", root, new ViewDataDictionary(ViewData)
+                                {
+                                    ["SelectedSlugs"] = Model.Filter.Categories ?? new List<string>()
+                                })
                             }
                         </div>
                     </div>
+
+                    <!-- Price Range -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-dollar-sign me-1"></i>
+                            Khoảng giá
+                        </label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" 
+                                       class="form-control form-control-sm" 
+                                       name="min" 
+                                       value="@Model.Filter.Min" 
+                                       placeholder="Từ..." />
+                            </div>
+                            <div class="col-6">
+                                <input type="number" 
+                                       class="form-control form-control-sm" 
+                                       name="max" 
+                                       value="@Model.Filter.Max" 
+                                       placeholder="Đến..." />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Material -->
+                    @if (!string.IsNullOrEmpty(Model.Filter.Material))
+                    {
+                        <input type="hidden" name="material" value="@Model.Filter.Material" />
+                    }
+
+                    <!-- Style -->
+                    @if (!string.IsNullOrEmpty(Model.Filter.Style))
+                    {
+                        <input type="hidden" name="style" value="@Model.Filter.Style" />
+                    }
+
+                    <!-- Sort -->
+                    <input type="hidden" name="sort" value="@Model.Filter.Sort" />
+                    <input type="hidden" name="page" value="1" />
+                    <input type="hidden" name="pageSize" value="@Model.Filter.PageSize" />
+
+                    <!-- Filter Buttons -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-1"></i>
+                            Áp dụng
+                        </button>
+                        <a href="/products" class="btn btn-outline-secondary">
+                            <i class="fas fa-redo me-1"></i>
+                            Đặt lại
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="col-lg-9">
+        <!-- Toolbar -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="mb-0 fw-semibold">
+                                <i class="fas fa-sort me-1"></i>
+                                Sắp xếp:
+                            </label>
+                            <select class="form-select form-select-sm" 
+                                    style="max-width: 200px;" 
+                                    onchange="changeSort(this.value)">
+                                <option value="">Mặc định</option>
+                                <option value="name_asc" selected="@(Model.Filter.Sort == "name_asc")">
+                                    Tên A-Z
+                                </option>
+                                <option value="name_desc" selected="@(Model.Filter.Sort == "name_desc")">
+                                    Tên Z-A
+                                </option>
+                                <option value="price_asc" selected="@(Model.Filter.Sort == "price_asc")">
+                                    Giá tăng dần
+                                </option>
+                                <option value="price_desc" selected="@(Model.Filter.Sort == "price_desc")">
+                                    Giá giảm dần
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span class="text-muted small">
+                            Trang @Model.Filter.Page / @Model.TotalPages
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        @if (Model.Items.Any())
+        {
+            <div class="row g-4">
+                @foreach (var p in Model.Items)
+                {
+                    var img = string.IsNullOrWhiteSpace(p.MainImageUrl) ? placeholder : p.MainImageUrl;
+                    var url = $"/products/{p.Slug}";
+                    var hasSale = p.SalePrice.HasValue && p.SalePrice.Value < p.Price;
+
+                    <div class="col-sm-6 col-md-4">
+                        <div class="card product-card position-relative h-100">
+                            @if (hasSale)
+                            {
+                                var discount = Math.Round((1 - p.SalePrice.Value / p.Price) * 100);
+                                <div class="product-badge">
+                                    <i class="fas fa-fire me-1"></i>-@(discount)%
+                                </div>
+                            }
+
+                            <div style="position: relative; overflow: hidden;">
+                                <img class="card-img-top"
+                                     src="@img"
+                                     alt="@p.Name"
+                                     style="aspect-ratio:4/3; object-fit:cover;"
+                                     onerror="this.src='/images/placeholder.png'" />
+                            </div>
+
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="fw-semibold mb-2" style="min-height: 2.4em; line-height: 1.2;">
+                                    @p.Name
+                                </h6>
+
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-tag me-1"></i>@p.CategoryName
+                                </p>
+
+                                <div class="product-price mb-3">
+                                    @if (hasSale)
+                                    {
+                                        <span class="price-original">@p.Price.ToVnd()</span>
+                                        <span class="price-sale">@p.SalePrice!.Value.ToVnd()</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="price-regular">@p.Price.ToVnd()</span>
+                                    }
+                                </div>
+
+                                <div class="mt-auto">
+                                    <a href="@url" class="btn btn-primary w-100">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
+
+                            <a class="stretched-link" href="@url"></a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        @{
+                            int page = Model.Filter.Page;
+                            int totalPages = Model.TotalPages;
+
+                            string Encode(string? s) => Uri.EscapeDataString(s ?? "");
+
+                            string BuildUrl(int p)
+                            {
+                                var qs = new List<string>();
+
+                                var cats = Model.Filter.Categories ?? new List<string>();
+                                foreach (var c in cats.Where(x => !string.IsNullOrWhiteSpace(x)))
+                                    qs.Add($"Categories={Encode(c)}");
+
+                                if (!string.IsNullOrWhiteSpace(Model.Filter.Q)) qs.Add($"q={Encode(Model.Filter.Q)}");
+                                if (Model.Filter.Min.HasValue) qs.Add($"min={Model.Filter.Min.Value}");
+                                if (Model.Filter.Max.HasValue) qs.Add($"max={Model.Filter.Max.Value}");
+                                if (!string.IsNullOrWhiteSpace(Model.Filter.Material)) qs.Add($"material={Encode(Model.Filter.Material)}");
+                                if (!string.IsNullOrWhiteSpace(Model.Filter.Style)) qs.Add($"style={Encode(Model.Filter.Style)}");
+                                if (!string.IsNullOrWhiteSpace(Model.Filter.Sort)) qs.Add($"sort={Encode(Model.Filter.Sort)}");
+
+                                qs.Add($"page={p}");
+                                qs.Add($"pageSize={Model.Filter.PageSize}");
+
+                                return "/products?" + string.Join("&", qs);
+                            }
+                        }
+
+                        <li class="page-item @(Model.Filter.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="@BuildUrl(page - 1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        @for (int i = Math.Max(1, page - 2); i <= Math.Min(totalPages, page + 2); i++)
+                        {
+                            <li class="page-item @(i == page ? "active" : "")">
+                                <a class="page-link" href="@BuildUrl(i)">@i</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.Filter.Page >= totalPages ? "disabled" : "")">
+                            <a class="page-link" href="@BuildUrl(page + 1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">Không tìm thấy sản phẩm nào</h5>
+                    <p class="text-muted mb-3">Hãy thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
+                    <a href="/products" class="btn btn-primary">
+                        <i class="fas fa-redo me-1"></i>
+                        Đặt lại bộ lọc
+                    </a>
                 </div>
             </div>
         }
     </div>
-}
-
-@if (Model.TotalPages > 1)
-{
-    <nav class="mt-4">
-        <ul class="pagination">
-            @{
-                int page = Model.Filter.Page;
-                int totalPages = Model.TotalPages;
-
-                string Encode(string? s) => Uri.EscapeDataString(s ?? "");
-
-                string BuildUrl(int p)
-                {
-                    var qs = new List<string>();
-
-                    var cats = Model.Filter.Categories ?? new List<string>();
-                    foreach (var c in cats.Where(x => !string.IsNullOrWhiteSpace(x)))
-                        qs.Add($"Categories={Encode(c)}");
-
-                    if (!string.IsNullOrWhiteSpace(Model.Filter.Q)) qs.Add($"q={Encode(Model.Filter.Q)}");
-                    if (Model.Filter.Min.HasValue) qs.Add($"min={Model.Filter.Min.Value}");
-                    if (Model.Filter.Max.HasValue) qs.Add($"max={Model.Filter.Max.Value}");
-                    if (!string.IsNullOrWhiteSpace(Model.Filter.Material)) qs.Add($"material={Encode(Model.Filter.Material)}");
-                    if (!string.IsNullOrWhiteSpace(Model.Filter.Style)) qs.Add($"style={Encode(Model.Filter.Style)}");
-                    if (!string.IsNullOrWhiteSpace(Model.Filter.Sort)) qs.Add($"sort={Encode(Model.Filter.Sort)}");
-
-                    qs.Add($"page={p}");
-                    qs.Add($"pageSize={Model.Filter.PageSize}");
-
-                    return "/products?" + string.Join("&", qs);
-                }
-            }
-
-            <li class="page-item @(Model.Filter.Page <= 1 ? "disabled" : "")">
-                <a class="page-link" href="@BuildUrl(page - 1)">Prev</a>
-            </li>
-
-            @for (int i = 1; i <= totalPages; i++)
-            {
-                <li class="page-item @(i == page ? "active" : "")">
-                    <a class="page-link" href="@BuildUrl(i)">@i</a>
-                </li>
-            }
-
-            <li class="page-item @(Model.Filter.Page >= totalPages ? "disabled" : "")">
-                <a class="page-link" href="@BuildUrl(page + 1)">Next</a>
-            </li>
-        </ul>
-    </nav>
-}
-
-<!-- ✅ CSS để tags gọn + không tuột layout (không dùng section Styles để tránh lỗi) -->
-<style>
-    .cat-tags-box {
-        display: none; /* bật khi có items */
-        max-height: 72px;
-        overflow: auto;
-        flex-wrap: wrap;
-        gap: 6px;
-        padding: 2px 0;
-    }
-
-        .cat-tags-box .badge {
-            font-size: .825rem;
-            line-height: 1.2;
-            padding: .35rem .55rem;
-            border-radius: 999px;
-        }
-
-        .cat-tags-box .cat-tag-remove {
-            font-size: 1rem;
-            line-height: 1;
-        }
-</style>
+</div>
 
 @section Scripts {
     <script>
-        (function () {
-          function rebuildHiddenInputs(values) {
-            const wrap = document.getElementById("catHiddenInputs");
-            wrap.innerHTML = "";
-            values.forEach(v => {
-              const input = document.createElement("input");
-              input.type = "hidden";
-              input.name = "Categories";
-              input.value = v;
-              wrap.appendChild(input);
-            });
-          }
-
-          function rebuildTags(items) {
-            const wrap = document.getElementById("catTags");
-            wrap.innerHTML = "";
-
-            if (!items.length) {
-              wrap.style.display = "none";
-              return;
-            }
-
-            wrap.style.display = "flex";
-
-            items.forEach(it => {
-              const span = document.createElement("span");
-              span.className = "badge text-bg-primary cat-tag";
-              span.dataset.slug = it.slug;
-              span.innerHTML =
-                `${it.name} <button type="button" class="btn btn-sm btn-link text-white p-0 ms-2 cat-tag-remove" style="text-decoration:none;">×</button>`;
-              wrap.appendChild(span);
-            });
-          }
-
-          function getSelectedFromChecks() {
-            const checks = Array.from(document.querySelectorAll(".cat-check:checked"));
-            const items = checks.map(c => ({ slug: c.value, name: c.dataset.name || c.value }));
-
-            const map = new Map();
-            items.forEach(it => map.set(it.slug, it));
-            return Array.from(map.values());
-          }
-
-          document.addEventListener("change", function (e) {
-            const el = e.target;
-            if (!el.classList.contains("cat-check")) return;
-
-            const items = getSelectedFromChecks();
-            rebuildHiddenInputs(items.map(x => x.slug));
-            rebuildTags(items);
-          });
-
-          document.addEventListener("click", function (e) {
-            const btn = e.target.closest(".cat-tag-remove");
-            if (!btn) return;
-
-            const tag = btn.closest(".cat-tag");
-            const slug = tag?.dataset?.slug;
-            if (!slug) return;
-
-            const cb = document.querySelector(`.cat-check[value="${CSS.escape(slug)}"]`);
-            if (cb) cb.checked = false;
-
-            const items = getSelectedFromChecks();
-            rebuildHiddenInputs(items.map(x => x.slug));
-            rebuildTags(items);
-          });
-
-          // Init
-          const initItems = getSelectedFromChecks();
-          rebuildTags(initItems);
-        })();
+        function changeSort(value) {
+            const form = document.getElementById('filterForm');
+            const sortInput = form.querySelector('input[name="sort"]');
+            sortInput.value = value;
+            const pageInput = form.querySelector('input[name="page"]');
+            pageInput.value = 1;
+            form.submit();
+        }
     </script>
 }

@@ -1,4 +1,4 @@
-using FurnitureShop.Hubs;
+﻿using FurnitureShop.Hubs;
 using FurnitureShop.Models;
 using FurnitureShop.Services.Auth;
 using FurnitureShop.Services.Cart;
@@ -66,6 +66,16 @@ builder.Services.AddScoped<NotificationService>();
 
 var app = builder.Build();
 
+// Seed data (chỉ trong môi trường Development)
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<FurnitureShopContext>();
+
+    // Seed data phong phú (merged từ DbSeeder + SeedRichData)
+    await FurnitureShop.Scripts.SeedRichData.ExecuteAsync(db);
+}
+
 app.UsePathBase("/nvv");
 
 // Error pipeline
@@ -110,7 +120,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Auto seed demo data 
+// Comment auto seed cũ (đã merge vào SeedRichData)
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<IDbSeeder>();

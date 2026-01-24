@@ -4,13 +4,14 @@
     var level = (int)(ViewData["Level"] ?? 0);
     var padding = 8 + level * 14;
     var selectedSlugs = (List<string>)(ViewData["SelectedSlugs"] ?? new List<string>());
-    var isChecked = selectedSlugs.Contains(Model.Slug);
+    var isChecked = selectedSlugs.Any(x => string.Equals(x, Model.Slug, StringComparison.OrdinalIgnoreCase));
     var hasChildren = Model.Children != null && Model.Children.Count > 0;
 }
 
 <div class="d-flex align-items-center py-1" style="padding-left:@(padding)px;">
     <input class="form-check-input me-2 cat-check"
            type="checkbox"
+           name="Categories"
            value="@Model.Slug"
            data-name="@Model.Name"
            @(isChecked ? "checked" : "") />
