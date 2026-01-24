@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "NQpdC2GP5TY=",
+  "dgSpecHash": "CmC2h1Rrf2Q=",
   "success": true,
   "projectFilePath": "D:\\Work\\FurnitureShop\\FurnitureShop\\FurnitureShop.csproj",
   "expectedPackageFiles": [
@@ -48,6 +48,7 @@
     "C:\\Users\\spiri\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\8.0.20\\microsoft.entityframeworkcore.abstractions.8.0.20.nupkg.sha512",
     "C:\\Users\\spiri\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\8.0.20\\microsoft.entityframeworkcore.analyzers.8.0.20.nupkg.sha512",
     "C:\\Users\\spiri\\.nuget\\packages\\microsoft.entityframeworkcore.design\\8.0.20\\microsoft.entityframeworkcore.design.8.0.20.nupkg.sha512",
+    "C:\\Users\\spiri\\.nuget\\packages\\microsoft.entityframeworkcore.inmemory\\8.0.20\\microsoft.entityframeworkcore.inmemory.8.0.20.nupkg.sha512",
     "C:\\Users\\spiri\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\8.0.20\\microsoft.entityframeworkcore.relational.8.0.20.nupkg.sha512",
     "C:\\Users\\spiri\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\8.0.20\\microsoft.entityframeworkcore.sqlserver.8.0.20.nupkg.sha512",
     "C:\\Users\\spiri\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\8.0.20\\microsoft.entityframeworkcore.tools.8.0.20.nupkg.sha512",
